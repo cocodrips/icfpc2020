@@ -5,4 +5,4 @@ steps:
   args: ['build', '-f', './dockerfiles/dockerfiles/python/Dockerfile', '-t', 'gcr.io/$PROJECT_ID/client:$SHORT_SHA', '.']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-f', './Dockerfile.server', '-t', 'gcr.io/$PROJECT_ID/judge-dummy:$SHORT_SHA', '.']
-  images: ['gcr.io/$PROJECT_ID/client:$SHORT_SHA', 'gcr.io/$PROJECT_ID/judge-dummy:$SHORT_SHA']
+images: ['gcr.io/$PROJECT_ID/client:$SHORT_SHA', 'gcr.io/$PROJECT_ID/judge-dummy:$SHORT_SHA']
