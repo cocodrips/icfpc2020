@@ -2,7 +2,7 @@ steps:
 - name: 'gcr.io/cloud-builders/git'
   args: ['clone', 'https://github.com/icfpcontest2020/dockerfiles']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-f', 'dockerfiles/python/Dockerfile', '-t', 'gcr.io/$PROJECT_ID/client', '.']
+  args: ['build', '-f', './dockerfiles/python/Dockerfile', '-t', 'gcr.io/$PROJECT_ID/client', '.']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-f', './Dockerfile.server', '-t', 'gcr.io/$PROJECT_ID/judge-dummy', '.']
 images: ['gcr.io/$PROJECT_ID/client', 'gcr.io/$PROJECT_ID/judge-dummy']
