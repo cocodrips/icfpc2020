@@ -1,0 +1,6 @@
+steps:
+- name: 'ubuntu'
+  args: ['mv', './Dockerfile.client', './Dockerfile']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/client', '.']
+images: ['gcr.io/$PROJECT_ID/']
