@@ -1,0 +1,3 @@
+FROM python
+COPY judge-dummy /judge-dummy
+WORKDIR judge-dummy
