@@ -1,4 +1,4 @@
-NAME := util-server
+NAME := portal
 TAG := latest
 HOST := gcr.io
 PROJECT_ID := icfpc2020-bokuyaba
