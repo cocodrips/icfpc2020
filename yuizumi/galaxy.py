@@ -1,6 +1,6 @@
 import enum
-import fileinput
 import re
+import sys
 
 
 _NUMBER_RE = re.compile('^-?[0-9]+$')
@@ -155,12 +155,26 @@ def _call(f, x):
     return f._invoke(x)
 
 
-def main():
-    for line in fileinput.input():
+def _pretty_print(x):
+    if x == _Special.NIL:
+        return []
+    if isinstance(x, tuple):
+        car, cdr = x
+        car = _pretty_print(car)
+        cdr = _pretty_print(cdr)
+        if isinstance(cdr, list):
+            return [car] + cdr
+        return (car, cdr)
+    return x
+
+
+def main(argv):
+    sys.setrecursionlimit(100000)
+    for line in sys.stdin:
         lhs, _, *rhs = line.split()
         _ENV[lhs] = _Expr(lhs, rhs)
-    print(_reduce(_ENV['galaxy']))
+    print(_pretty_print(_reduce(_Expr('<input>', argv[1:]))))
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
