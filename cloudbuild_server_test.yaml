@@ -8,6 +8,9 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['run', "--network=cloudbuild", '--env', 'PORT=8080', '--name', 'judgedummy', '-td', 'judge-dummy:$SHORT_SHA']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['run', "--network=cloudbuild", '-t', 'client:$SHORT_SHA', 'http://judgedummy:8080/', 'test_key']
+  entrypoint: 'bash'
+  args: 
+    - '-c'
+    - 'docker run -t --network=cloudbuild client:$SHORT_SHA http://judgedummy:808/ test_key'
 - name: 'gcr.io/cloud-builders/docker'
   args: ['logs', 'judgedummy']
