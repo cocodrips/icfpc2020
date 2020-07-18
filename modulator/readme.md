@@ -1,0 +1,2 @@
+`$ rustc -O main.rs`
+
