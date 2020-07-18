@@ -351,6 +351,8 @@ public:
     Number eval(Number value) {
         switch (token_.tag) {
             case Tag::kNeg: return -value;
+            case Tag::kPwr2: return 1LL << value;
+            case Tag::kIdentity: return value;
             case Tag::kInc: return value + 1;
             case Tag::kDec: return value - 1;
         }

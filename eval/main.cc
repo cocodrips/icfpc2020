@@ -81,6 +81,8 @@ ExprPtr CreateExpr(const Token& token) {
                 return outer;
         }
         case Tag::kNeg:
+        case Tag::kPwr2:
+        case Tag::kIdentity:
         case Tag::kInc:
         case Tag::kDec: {
                 auto param = std::make_shared<FuncParam>(token);
