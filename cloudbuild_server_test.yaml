@@ -11,6 +11,6 @@ steps:
   entrypoint: 'bash'
   args: 
     - '-c'
-    - 'docker run -t --network=cloudbuild client:$SHORT_SHA http://judgedummy:808/ test_key'
+    - 'docker run -t --network=cloudbuild --entorypoint=./strict_run.sh client:$SHORT_SHA http://judgedummy:808/ test_key'
 - name: 'gcr.io/cloud-builders/docker'
   args: ['logs', 'judgedummy']
