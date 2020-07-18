@@ -6,14 +6,26 @@ import subprocess
 app = Flask(__name__)
 
 
-@app.route('/demodulator')
-def demodulate():
-    value = request.args.get("value")
+def demodulate(value):
+    if not value:
+        return ""
     args = "bin/demodulator"
     proc = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
     stdout_value, stderr_value = proc.communicate(value)
-    print(stdout_value)
     return stdout_value
+
+
+@app.route('/demodulator')
+def demodulator():
+    value = request.args.get("value")
+    result = demodulate(value)
+    return render_template("demodulator.html", value=result)
+
+
+@app.route('/demodulate')
+def demodulator_api():
+    value = request.args.get("value")
+    return demodulate(value)
 
 
 @app.route('/')
