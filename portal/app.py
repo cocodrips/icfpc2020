@@ -1,8 +1,9 @@
 import os
 
 from flask import Flask, request, render_template, Response
-from api import demodulator, visualizer
+from api import demodulator, visualizer, interactor
 from jinja2 import Template, Environment, FileSystemLoader
+import json
 
 app = Flask(__name__)
 
@@ -31,6 +32,32 @@ def demodulator_api():
     value = request.args.get("value")
     return demodulator.demodulate(value)
 
+@app.route('/interact')
+def interact_api():
+    protocol = request.args.get("protocol")
+    state = request.args.get("state")
+    value = request.args.get("value")
+    max_index = request.args.get("max_index")
+    return interactor.interact(protocol, state, value, max_index)
+
+@app.route('/protocol/dummy')
+def protocol_dummy_api():
+    state = request.args.get("state")
+    value = request.args.get("value")
+    return json.dumps({
+        "flag": 1, 
+        "state": state, 
+        "value": value,
+        })
+@app.route('/protocol/statelessdraw')
+def protocol_statelessdraw_api():
+    state = request.args.get("state")
+    value = request.args.get("value")
+    return json.dumps({
+        "flag": 0, 
+        "state": 0, 
+        "value": value,
+        })
 
 @app.route('/')
 def hello_world():
