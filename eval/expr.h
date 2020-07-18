@@ -212,7 +212,8 @@ public:
 
     ExprPtr Reduce(Env& env) override {
         func_ = ReduceIfPossible(func_, env);
-        arg_ = ReduceIfPossible(arg_, env);
+        // Lazy?
+        // arg_ = ReduceIfPossible(arg_, env);
         Func* func = dynamic_cast<Func*>(func_.get());
         if (!func) {
             std::clog << "Not a function: " << func_ << std::endl;
@@ -336,6 +337,58 @@ public:
 protected:
     ExprPtr left_;
     ExprPtr right_;
+};
+
+class UnaryExpr : public Expr {
+public:
+    UnaryExpr(const Token& token, ExprPtr expr) : Expr(token), expr_(expr) {}
+    void Output(std::ostream& os) const override {
+        os << token_ << "(";
+        expr_->Output(os);
+        os << ")";
+    }
+
+    Number eval(Number value) {
+        switch (token_.tag) {
+            case Tag::kNeg: return -value;
+            case Tag::kInc: return value + 1;
+            case Tag::kDec: return value - 1;
+        }
+        std::clog << "Unsupported unary op: " << token_ << std::endl;
+        std::abort();
+    }
+
+    ExprPtr Reduce(Env& env) override {
+        expr_ = ReduceIfPossible(expr_, env);
+        NumberExpr* num_expr = dynamic_cast<NumberExpr*>(expr_.get());
+        if (!num_expr) {
+            std::clog << "Not a number: " << expr_ << std::endl;
+            return nullptr;
+        }
+        Token dummyToken = token_;
+        dummyToken.tag = Tag::kNumber;
+        dummyToken.num = eval(num_expr->value());
+        return std::make_shared<NumberExpr>(dummyToken);
+    }
+
+    ExprPtr Clone(std::unordered_map<int, int>& id_map) override {
+        ExprPtr new_expr = expr_->Clone(id_map);
+        if (!new_expr) {
+            return nullptr;
+        }
+        return std::make_shared<UnaryExpr>(token_, new_expr ? new_expr : expr_);
+    }
+
+    ExprPtr Apply(int param_id, ExprPtr arg) override {
+        ExprPtr new_expr = expr_->Apply(param_id, arg);
+        if (!new_expr) {
+            return nullptr;
+        }
+        return std::make_shared<UnaryExpr>(token_, new_expr ? new_expr : expr_);
+    }
+
+protected:
+    ExprPtr expr_;
 };
 
 std::ostream& operator<<(std::ostream& os, const Expr& expr) {

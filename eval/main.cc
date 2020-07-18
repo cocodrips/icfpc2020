@@ -79,10 +79,46 @@ ExprPtr CreateExpr(const Token& token) {
                 auto inner = std::make_shared<Func>(token, right, binary);
                 auto outer = std::make_shared<Func>(token, left, inner);
                 return outer;
+        }
+        case Tag::kNeg:
+        case Tag::kInc:
+        case Tag::kDec: {
+                auto param = std::make_shared<FuncParam>(token);
+                auto unary = std::make_shared<UnaryExpr>(token, param);
+                return std::make_shared<Func>(token, param, unary);
             }
         case Tag::kTrue:
-        case Tag::kFalse:
-            return std::make_shared<BoolExpr>(token);
+        case Tag::kFalse: {
+                auto cond = std::make_shared<BoolExpr>(token);
+                auto left = std::make_shared<FuncParam>(token);
+                auto right = std::make_shared<FuncParam>(token);
+                auto if_expr = std::make_shared<IfExpr>(token, cond, left, right);
+                auto inner = std::make_shared<Func>(token, right, if_expr);
+                auto outer = std::make_shared<Func>(token, left, inner);
+                return outer;
+        }
+        case Tag::kIf0: {
+                auto param = std::make_shared<FuncParam>(token);
+                auto cond = std::make_shared<If0Expr>(token, param);
+                auto left = std::make_shared<FuncParam>(token);
+                auto right = std::make_shared<FuncParam>(token);
+                auto if_expr = std::make_shared<IfExpr>(token, cond, left, right);
+                return std::make_shared<Func>(token, param,
+                    std::make_shared<Func>(token, left,
+                    std::make_shared<Func>(token, right, if_expr)));
+        }
+        case Tag::kSCombinator: {
+            // ap ap ap s x0 x1 x2 = ap ap x0 x2 ap x1 x2
+            auto x0 = std::make_shared<FuncParam>(token);
+            auto x1 = std::make_shared<FuncParam>(token);
+            auto x2 = std::make_shared<FuncParam>(token);
+            auto ap_x0_x2 = std::make_shared<ApplyExpr>(token, x0, x2);
+            auto ap_x1_x2 = std::make_shared<ApplyExpr>(token, x1, x2);
+            auto ap = std::make_shared<ApplyExpr>(token, ap_x0_x2, ap_x1_x2);
+            return std::make_shared<Func>(token, x0,
+                std::make_shared<Func>(token, x1,
+                std::make_shared<Func>(token, x2, ap)));
+        }
     }
     std::clog << "Unsupported token: " << token << " at line " << token.line << std::endl;
     std::abort();
