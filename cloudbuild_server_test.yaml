@@ -1,0 +1,16 @@
+steps:
+- name: 'gcr.io/cloud-builders/git'
+  args: ['clone', 'https://github.com/icfpcontest2020/dockerfiles']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-f', './dockerfiles/dockerfiles/python/Dockerfile', '-t', 'client:$SHORT_SHA', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-f', './Dockerfile.server', '-t', 'judge-dummy:$SHORT_SHA', '.']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['run', "--network=cloudbuild", '--env', 'PORT=8080', '--name', 'judgedummy', '-d', 'judge-dummy:$SHORT_SHA']
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'bash'
+  args: 
+    - '-c'
+    - 'docker run -t --network=cloudbuild --entrypoint=./strict_run.sh client:$SHORT_SHA http://judgedummy:8080/ test_key'
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['logs', 'judgedummy']
