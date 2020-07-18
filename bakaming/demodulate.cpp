@@ -27,8 +27,8 @@ void modulate() {
         }
       }
       pt += 2;
-    } else if (input[pt] == '1' && input[pt+1] == '1') { // cond
-      std::cout<<"( cond ";
+    } else if (input[pt] == '1' && input[pt+1] == '1') { // cons
+      std::cout<<"( cons ";
       st.push(2);
       pt += 2;
     } else { // number
