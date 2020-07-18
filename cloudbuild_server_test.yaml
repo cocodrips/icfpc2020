@@ -8,4 +8,4 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['run', '--name', 'judgedummy', '-d', 'judge-dummy:$SHORT_SHA']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['run', 'client:$SHORT_SHA', 'http://judgedummy', 'test_key']
+  args: ['run', 'client:$SHORT_SHA', 'http://judgedummy/', 'test_key']
