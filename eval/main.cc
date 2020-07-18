@@ -62,7 +62,7 @@ std::vector<std::vector<Token>> Tokenize(std::istream& in_stream) {
     return result;
 }
 
-std::shared_ptr<Expr> CreateExpr(const Token& token) {
+ExprPtr CreateExpr(const Token& token) {
     switch (token.tag) {
         case Tag::kNumber:
             return std::make_shared<NumberExpr>(token);
@@ -88,12 +88,12 @@ std::shared_ptr<Expr> CreateExpr(const Token& token) {
     std::abort();
 }
 
-bool ReduceStack(std::vector<std::shared_ptr<Expr>>& stack) {
+bool ReduceStack(std::vector<ExprPtr>& stack) {
     if (stack.size() < 3) {
         return false;
     }
-    std::shared_ptr<Expr> func = stack[stack.size() - 2];
-    std::shared_ptr<Expr> arg = stack[stack.size() - 1];
+    ExprPtr func = stack[stack.size() - 2];
+    ExprPtr arg = stack[stack.size() - 1];
     if (!func->built() || !arg->built()) {
         return false;
     }
@@ -108,8 +108,8 @@ bool ReduceStack(std::vector<std::shared_ptr<Expr>>& stack) {
     return true;
 }
 
-std::shared_ptr<Expr> ParseExpr(const std::vector<Token>& tokens, int start) {
-    std::vector<std::shared_ptr<Expr>> stack;
+ExprPtr ParseExpr(const std::vector<Token>& tokens, int start) {
+    std::vector<ExprPtr> stack;
     for (int i = start; i < tokens.size(); i++) {
         const Token& token = tokens[i];
         stack.push_back(CreateExpr(token));
@@ -139,7 +139,7 @@ int main() {
     std::vector<std::vector<Token>> lines = Tokenize(std::cin);
     Env env = Parse(lines);
     std::clog << env << std::endl;
-    std::shared_ptr<Expr> reduced = env.last_expr()->Reduce(env);
+    ExprPtr reduced = env.last_expr()->Reduce(env);
     if (!reduced) {
         std::clog << "Failed to reduce." << std::endl;
         std::clog << env.last_expr() << std::endl;

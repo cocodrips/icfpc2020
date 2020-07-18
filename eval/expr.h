@@ -9,21 +9,23 @@
 #include "token.h"
 
 class Expr;
+typedef std::shared_ptr<Expr> ExprPtr;
+
 std::ostream& operator<<(std::ostream& os, const Expr& expr);
-std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Expr>& expr);
+std::ostream& operator<<(std::ostream& os, const ExprPtr& expr);
 
 class Def {
 public:
-    Def(const Token& token, std::shared_ptr<Expr> expr)
+    Def(const Token& token, ExprPtr expr)
         : token_(token), expr_(expr) {
             assert(token_.tag == Tag::kVariable || token_.tag == Tag::kGalaxy);
         }
     Number name() const { return token_.num; }
-    std::shared_ptr<Expr> expr() const { return expr_; }
+    ExprPtr expr() const { return expr_; }
 
 private:
     Token token_;
-    std::shared_ptr<Expr> expr_;
+    ExprPtr expr_;
 };
 
 std::ostream& operator<<(std::ostream& os, const Def& def) {
@@ -33,8 +35,8 @@ std::ostream& operator<<(std::ostream& os, const Def& def) {
 
 class Env {
 public:
-    void set_last_expr(std::shared_ptr<Expr> last_expr) { last_expr_ = last_expr; }
-    std::shared_ptr<Expr> last_expr() const {
+    void set_last_expr(ExprPtr last_expr) { last_expr_ = last_expr; }
+    ExprPtr last_expr() const {
         if (last_expr_) {
             return last_expr_;
         } else if (!defs_.empty()) {
@@ -48,7 +50,7 @@ public:
         defs_.push_back(def);
     }
 
-    std::shared_ptr<Expr> GetGlobal(Number name) {
+    ExprPtr GetGlobal(Number name) {
         auto index = name_to_def_.find(name);
         if (index == name_to_def_.end()) {
             return nullptr;
@@ -68,7 +70,7 @@ public:
 private:
     std::vector<Def> defs_;
     std::unordered_map<Number, size_t> name_to_def_;
-    std::shared_ptr<Expr> last_expr_;
+    ExprPtr last_expr_;
 };
 
 class Expr {
@@ -79,15 +81,15 @@ public:
     virtual bool built() const { return true; }
     bool reduced() { return reduced_; }
 
-    virtual std::shared_ptr<Expr> Reduce(Env& env) {
+    virtual ExprPtr Reduce(Env& env) {
         return nullptr;
     }
 
-    virtual std::shared_ptr<Expr> Clone(std::unordered_map<int, int>& id_map) {
+    virtual ExprPtr Clone(std::unordered_map<int, int>& id_map) {
         return nullptr;
     }
 
-    virtual std::shared_ptr<Expr> Apply(int param_id, std::shared_ptr<Expr> arg) {
+    virtual ExprPtr Apply(int param_id, ExprPtr arg) {
         return nullptr;
     }
 
@@ -100,11 +102,11 @@ protected:
     bool reduced_;
 };
 
-std::shared_ptr<Expr> ReduceIfPossible(std::shared_ptr<Expr> expr, Env& env) {
+ExprPtr ReduceIfPossible(ExprPtr expr, Env& env) {
     if (expr->reduced()) {
         return expr;
     }
-    std::shared_ptr<Expr> reduced = expr->Reduce(env);
+    ExprPtr reduced = expr->Reduce(env);
     if (!reduced) {
         std::clog << "Not reduced: " << std::endl << expr << std::endl << std::endl;
         return expr;
@@ -130,11 +132,11 @@ public:
         os << "x" << id_;
     }
 
-    std::shared_ptr<Expr> Clone(std::unordered_map<int, int>& id_map) override {
+    ExprPtr Clone(std::unordered_map<int, int>& id_map) override {
         return std::make_shared<FuncParam>(token_, id_map[id_]);
     }
 
-    std::shared_ptr<Expr> Apply(int param_id, std::shared_ptr<Expr> arg) override {
+    ExprPtr Apply(int param_id, ExprPtr arg) override {
         return param_id == id_ ? arg : nullptr;
     }
 
@@ -144,28 +146,28 @@ protected:
 
 class Func : public Expr {
 public:
-    Func(const Token& token, std::shared_ptr<FuncParam> param, std::shared_ptr<Expr> expr)
+    Func(const Token& token, std::shared_ptr<FuncParam> param, ExprPtr expr)
         : Expr(token), param_id_(param->id()), expr_(expr) {}
     int param_id() const { return param_id_; }
-    std::shared_ptr<Expr> expr() const { return expr_; }
+    ExprPtr expr() const { return expr_; }
 
     void Output(std::ostream& os) const override {
         os << "λx" << param_id_ << ".";
         expr_->Output(os);
     }
 
-    std::shared_ptr<Expr> Clone(std::unordered_map<int, int>& id_map) override {
+    ExprPtr Clone(std::unordered_map<int, int>& id_map) override {
         std::shared_ptr<FuncParam> new_param = std::make_shared<FuncParam>(token_);
         id_map[param_id_] = new_param->id();
-        std::shared_ptr<Expr> new_expr = expr_->Clone(id_map);
+        ExprPtr new_expr = expr_->Clone(id_map);
         if (!new_expr) {
             return nullptr;
         }
         return std::make_shared<Func>(token_, new_param, new_expr);
     }
 
-    std::shared_ptr<Expr> Apply(int param_id, std::shared_ptr<Expr> arg) override {
-        std::shared_ptr<Expr> new_expr = expr_->Apply(param_id, arg);
+    ExprPtr Apply(int param_id, ExprPtr arg) override {
+        ExprPtr new_expr = expr_->Apply(param_id, arg);
         if (!new_expr) {
             return nullptr;
         }
@@ -173,27 +175,27 @@ public:
         return std::make_shared<Func>(token_, new_param, new_expr);
     }
 
-    std::shared_ptr<Expr> Apply(std::shared_ptr<Expr> arg) {
+    ExprPtr Apply(ExprPtr arg) {
         std::unordered_map<int, int> id_map;
-        std::shared_ptr<Expr> newArg = arg->Clone(id_map);
+        ExprPtr newArg = arg->Clone(id_map);
         return expr_->Apply(param_id_, newArg ? newArg : arg);
     }
 
 protected:
     int param_id_;
-    std::shared_ptr<Expr> expr_;
+    ExprPtr expr_;
 };
 
 class ApplyExpr : public Expr {
 public:
     ApplyExpr(const Token& token) : Expr(token) {}
-    ApplyExpr(const Token& token, std::shared_ptr<Expr> func, std::shared_ptr<Expr> arg)
+    ApplyExpr(const Token& token, ExprPtr func, ExprPtr arg)
         : Expr(token), func_(func), arg_(arg) {}
 
-    std::shared_ptr<Expr> func() const { return func_; }
-    void set_func(std::shared_ptr<Expr> func) { func_ = func; }
-    std::shared_ptr<Expr> arg() const { return arg_; }
-    void set_arg(std::shared_ptr<Expr> arg) { arg_ = arg; }
+    ExprPtr func() const { return func_; }
+    void set_func(ExprPtr func) { func_ = func; }
+    ExprPtr arg() const { return arg_; }
+    void set_arg(ExprPtr arg) { arg_ = arg; }
     virtual bool built() const { return func_ && arg_; };
 
     void Output(std::ostream& os) const override {
@@ -208,7 +210,7 @@ public:
         os << ")";
     }
 
-    std::shared_ptr<Expr> Reduce(Env& env) override {
+    ExprPtr Reduce(Env& env) override {
         func_ = ReduceIfPossible(func_, env);
         arg_ = ReduceIfPossible(arg_, env);
         Func* func = dynamic_cast<Func*>(func_.get());
@@ -216,13 +218,13 @@ public:
             std::clog << "Not a function: " << func_ << std::endl;
             return nullptr;
         }
-        std::shared_ptr<Expr> applied = func->Apply(arg_);
+        ExprPtr applied = func->Apply(arg_);
         return ReduceIfPossible(applied, env);
     }
 
-    std::shared_ptr<Expr> Clone(std::unordered_map<int, int>& id_map) override {
-        std::shared_ptr<Expr> new_func = func_->Clone(id_map);
-        std::shared_ptr<Expr> new_arg = arg_->Clone(id_map);
+    ExprPtr Clone(std::unordered_map<int, int>& id_map) override {
+        ExprPtr new_func = func_->Clone(id_map);
+        ExprPtr new_arg = arg_->Clone(id_map);
         if (!new_func && !new_arg) {
             return nullptr;
         }
@@ -230,9 +232,9 @@ public:
             token_, new_func ? new_func : func_, new_arg ? new_arg : arg_);
     }
 
-    std::shared_ptr<Expr> Apply(int param_id, std::shared_ptr<Expr> arg) override {
-        std::shared_ptr<Expr> new_func = func_->Apply(param_id, arg);
-        std::shared_ptr<Expr> new_arg = arg_->Apply(param_id, arg);
+    ExprPtr Apply(int param_id, ExprPtr arg) override {
+        ExprPtr new_func = func_->Apply(param_id, arg);
+        ExprPtr new_arg = arg_->Apply(param_id, arg);
         if (!new_func && !new_arg) {
             return nullptr;
         }
@@ -241,8 +243,8 @@ public:
     }
 
 protected:
-    std::shared_ptr<Expr> func_;
-    std::shared_ptr<Expr> arg_;
+    ExprPtr func_;
+    ExprPtr arg_;
 };
 
 class GlobalVar : public Expr {
@@ -252,8 +254,8 @@ public:
     void Output(std::ostream& os) const override {
         os << ":" << name();
     }
-    std::shared_ptr<Expr> Reduce(Env& env) override {
-        std::shared_ptr<Expr> value = env.GetGlobal(name());
+    ExprPtr Reduce(Env& env) override {
+        ExprPtr value = env.GetGlobal(name());
         return ReduceIfPossible(value, env);
     }
 };
@@ -271,10 +273,10 @@ public:
 
 class BinaryExpr : public Expr {
 public:
-    BinaryExpr(const Token& token, std::shared_ptr<Expr> left, std::shared_ptr<Expr> right)
+    BinaryExpr(const Token& token, ExprPtr left, ExprPtr right)
         : Expr(token), left_(left), right_(right) {}
-    std::shared_ptr<Expr> left() const { return left_; }
-    std::shared_ptr<Expr> right() const { return right_; }
+    ExprPtr left() const { return left_; }
+    ExprPtr right() const { return right_; }
     void Output(std::ostream& os) const override {
         os << token_ << "(";
         left_->Output(os);
@@ -292,7 +294,7 @@ public:
         std::abort();
     }
 
-    std::shared_ptr<Expr> Reduce(Env& env) override {
+    ExprPtr Reduce(Env& env) override {
         left_ = ReduceIfPossible(left_, env);
         right_ = ReduceIfPossible(right_, env);
         NumberExpr* leftNum = dynamic_cast<NumberExpr*>(left_.get());
@@ -311,9 +313,9 @@ public:
         return std::make_shared<NumberExpr>(dummyToken);
     }
 
-    std::shared_ptr<Expr> Clone(std::unordered_map<int, int>& id_map) override {
-        std::shared_ptr<Expr> new_left = left_->Clone(id_map);
-        std::shared_ptr<Expr> new_right = right_->Clone(id_map);
+    ExprPtr Clone(std::unordered_map<int, int>& id_map) override {
+        ExprPtr new_left = left_->Clone(id_map);
+        ExprPtr new_right = right_->Clone(id_map);
         if (!new_left && !new_right) {
             return nullptr;
         }
@@ -321,9 +323,9 @@ public:
             token_, new_left ? new_left : left_, new_right ? new_right : right_);
     }
 
-    std::shared_ptr<Expr> Apply(int param_id, std::shared_ptr<Expr> arg) override {
-        std::shared_ptr<Expr> new_left = left_->Apply(param_id, arg);
-        std::shared_ptr<Expr> new_right = right_->Apply(param_id, arg);
+    ExprPtr Apply(int param_id, ExprPtr arg) override {
+        ExprPtr new_left = left_->Apply(param_id, arg);
+        ExprPtr new_right = right_->Apply(param_id, arg);
         if (!new_left && !new_right) {
             return nullptr;
         }
@@ -332,8 +334,8 @@ public:
     }
 
 protected:
-    std::shared_ptr<Expr> left_;
-    std::shared_ptr<Expr> right_;
+    ExprPtr left_;
+    ExprPtr right_;
 };
 
 std::ostream& operator<<(std::ostream& os, const Expr& expr) {
@@ -341,7 +343,7 @@ std::ostream& operator<<(std::ostream& os, const Expr& expr) {
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Expr>& expr) {
+std::ostream& operator<<(std::ostream& os, const ExprPtr& expr) {
     expr->Output(os);
     return os;
 }
