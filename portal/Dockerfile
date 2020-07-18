@@ -4,7 +4,7 @@ RUN apt update && apt install -y make g++
 
 ENV APP_HOME /app
 WORKDIR $APP_HOME
-COPY . ./
+COPY portal /app
 
 RUN make build-tools
 ENV PATH $PATH:$APP_HOME/_build/demodulator/bin
