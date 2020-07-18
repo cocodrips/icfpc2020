@@ -38,7 +38,15 @@ def interact_api():
     state = request.args.get("state")
     value = request.args.get("value")
     max_index = request.args.get("max_index")
-    return interactor.interact(protocol, state, value, max_index)
+    return interactor.interact(protocol, state, value, max_index, True)
+
+@app.route('/interact-dummy')
+def interact_dummy_api():
+    protocol = request.args.get("protocol")
+    state = request.args.get("state")
+    value = request.args.get("value")
+    max_index = request.args.get("max_index")
+    return interactor.interact(protocol, state, value, max_index, False)
 
 @app.route('/protocol/dummy')
 def protocol_dummy_api():
