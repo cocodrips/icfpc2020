@@ -4,9 +4,9 @@ RUN apt update && apt install -y make g++
 
 ENV APP_HOME /app
 WORKDIR $APP_HOME
-COPY portal /app
+COPY . ./
 
-RUN make build-tools
+RUN cd portal & make build-tools
 ENV PATH $PATH:$APP_HOME/_build/demodulator/bin
 
 RUN pip install -r requirements.txt
