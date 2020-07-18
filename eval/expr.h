@@ -8,6 +8,8 @@
 #include <unordered_map>
 #include "token.h"
 
+bool enable_verbose_log = false;
+
 class Expr;
 typedef std::shared_ptr<Expr> ExprPtr;
 
@@ -81,15 +83,23 @@ public:
     virtual bool built() const { return true; }
     bool reduced() { return reduced_; }
 
+    // Returns null if nothing is changed.
     virtual ExprPtr Reduce(Env& env) {
         return nullptr;
     }
 
+    // Returns null if nothing is changed.
     virtual ExprPtr Clone(std::unordered_map<int, int>& id_map) {
         return nullptr;
     }
 
+    // Returns null if nothing is changed.
     virtual ExprPtr Apply(int param_id, ExprPtr arg) {
+        return nullptr;
+    }
+
+    // Null means apply is not supported.
+    virtual ExprPtr Apply(ExprPtr arg) {
         return nullptr;
     }
 
@@ -108,11 +118,15 @@ ExprPtr ReduceIfPossible(ExprPtr expr, Env& env) {
     }
     ExprPtr reduced = expr->Reduce(env);
     if (!reduced) {
-        std::clog << "Not reduced: " << std::endl << expr << std::endl << std::endl;
+        if (enable_verbose_log) {
+            std::clog << "Not reduced: " << std::endl << expr << std::endl << std::endl;
+        }
         return expr;
     }
-    std::clog << "Reduced:"<< std::endl;
-    std::clog << expr << std::endl << reduced << std::endl << std::endl;
+    if (enable_verbose_log) {
+        std::clog << "Reduced:"<< std::endl;
+        std::clog << expr << std::endl << reduced << std::endl << std::endl;
+    }
     return reduced;
 }
 
@@ -175,10 +189,11 @@ public:
         return std::make_shared<Func>(token_, new_param, new_expr);
     }
 
-    ExprPtr Apply(ExprPtr arg) {
+    ExprPtr Apply(ExprPtr arg) override {
         std::unordered_map<int, int> id_map;
-        ExprPtr newArg = arg->Clone(id_map);
-        return expr_->Apply(param_id_, newArg ? newArg : arg);
+        ExprPtr new_arg = arg->Clone(id_map);
+        ExprPtr new_expr = expr_->Apply(param_id_, new_arg ? new_arg : arg);
+        return new_expr ? new_expr : expr_;
     }
 
 protected:
@@ -214,12 +229,11 @@ public:
         func_ = ReduceIfPossible(func_, env);
         // Lazy?
         // arg_ = ReduceIfPossible(arg_, env);
-        Func* func = dynamic_cast<Func*>(func_.get());
-        if (!func) {
+        ExprPtr applied = func_->Apply(arg_);
+        if (!applied) {
             std::clog << "Not a function: " << func_ << std::endl;
             return nullptr;
         }
-        ExprPtr applied = func->Apply(arg_);
         return ReduceIfPossible(applied, env);
     }
 

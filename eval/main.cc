@@ -16,7 +16,9 @@ bool IsNum(const std::string& str) {
 
 Token ParseToken(const std::string& token_str) {
     auto tag = STR_TO_TAG.find(token_str);
-    if (tag != STR_TO_TAG.end()) {
+    if (tag != STR_TO_TAG.end() && tag->second == Tag::kGalaxy) {
+        return { tag->second, -1 };
+    } else if (tag != STR_TO_TAG.end()) {
         return { tag->second, 0L };
     } else if (token_str[0] == ':') {
         if (IsNum(token_str.substr(1))) {
@@ -80,6 +82,14 @@ ExprPtr CreateExpr(const Token& token) {
                 auto outer = std::make_shared<Func>(token, left, inner);
                 return outer;
         }
+        case Tag::kEq:
+        case Tag::kLt: {
+                auto left = std::make_shared<FuncParam>(token);
+                auto right = std::make_shared<FuncParam>(token);
+                auto comp = std::make_shared<CompExpr>(token, left, right);
+                return std::make_shared<Func>(token, left,
+                    std::make_shared<Func>(token, right, comp));
+        }
         case Tag::kNeg:
         case Tag::kPwr2:
         case Tag::kIdentity:
@@ -90,15 +100,8 @@ ExprPtr CreateExpr(const Token& token) {
                 return std::make_shared<Func>(token, param, unary);
             }
         case Tag::kTrue:
-        case Tag::kFalse: {
-                auto cond = std::make_shared<BoolExpr>(token);
-                auto left = std::make_shared<FuncParam>(token);
-                auto right = std::make_shared<FuncParam>(token);
-                auto if_expr = std::make_shared<IfExpr>(token, cond, left, right);
-                auto inner = std::make_shared<Func>(token, right, if_expr);
-                auto outer = std::make_shared<Func>(token, left, inner);
-                return outer;
-        }
+        case Tag::kFalse:
+            return std::make_shared<BoolExpr>(token);
         case Tag::kIf0: {
                 auto param = std::make_shared<FuncParam>(token);
                 auto cond = std::make_shared<If0Expr>(token, param);
@@ -117,6 +120,28 @@ ExprPtr CreateExpr(const Token& token) {
             auto ap_x0_x2 = std::make_shared<ApplyExpr>(token, x0, x2);
             auto ap_x1_x2 = std::make_shared<ApplyExpr>(token, x1, x2);
             auto ap = std::make_shared<ApplyExpr>(token, ap_x0_x2, ap_x1_x2);
+            return std::make_shared<Func>(token, x0,
+                std::make_shared<Func>(token, x1,
+                std::make_shared<Func>(token, x2, ap)));
+        }
+        case Tag::kCCombinator: {
+            // ap ap ap c x0 x1 x2 = ap ap x0 x2 x1
+            auto x0 = std::make_shared<FuncParam>(token);
+            auto x1 = std::make_shared<FuncParam>(token);
+            auto x2 = std::make_shared<FuncParam>(token);
+            auto ap_x0_x2 = std::make_shared<ApplyExpr>(token, x0, x2);
+            auto ap = std::make_shared<ApplyExpr>(token, ap_x0_x2, x1);
+            return std::make_shared<Func>(token, x0,
+                std::make_shared<Func>(token, x1,
+                std::make_shared<Func>(token, x2, ap)));
+        }
+        case Tag::kBCombinator: {
+            // ap ap ap b x0 x1 x2 = ap x0 ap x1 x2
+            auto x0 = std::make_shared<FuncParam>(token);
+            auto x1 = std::make_shared<FuncParam>(token);
+            auto x2 = std::make_shared<FuncParam>(token);
+            auto ap_x1_x2 = std::make_shared<ApplyExpr>(token, x1, x2);
+            auto ap = std::make_shared<ApplyExpr>(token, x0, ap_x1_x2);
             return std::make_shared<Func>(token, x0,
                 std::make_shared<Func>(token, x1,
                 std::make_shared<Func>(token, x2, ap)));

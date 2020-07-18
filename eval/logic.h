@@ -8,15 +8,95 @@
 #include "token.h"
 #include "expr.h"
 
+class IfExpr;
+
 class BoolExpr : public Expr {
 public:
     BoolExpr(const Token& token) : Expr(token) {
         reduced_ = true;
     }
     bool value() const { return token_.tag == Tag::kTrue; }
+
     void Output(std::ostream& os) const override {
-        os << value();
+        os << (value() ? "true" : "false");
     }
+
+    ExprPtr Apply(ExprPtr arg) override {
+        ExprPtr cond = std::make_shared<BoolExpr>(token_);
+        std::unordered_map<int, int> id_map;
+        ExprPtr new_arg = arg->Clone(id_map);
+        auto right = std::make_shared<FuncParam>(token_);
+        auto if_expr = std::make_shared<IfExpr>(token_, cond, new_arg ? new_arg : arg, right);
+        return std::make_shared<Func>(token_, right, if_expr);
+    }
+};
+
+// TODO: Inherit BinaryExpr.
+class CompExpr : public Expr {
+public:
+    CompExpr(const Token& token, ExprPtr left, ExprPtr right)
+        : Expr(token), left_(left), right_(right) {}
+    ExprPtr left() const { return left_; }
+    ExprPtr right() const { return right_; }
+    void Output(std::ostream& os) const override {
+        os << token_ << "(";
+        left_->Output(os);
+        os << ", ";
+        right_->Output(os);
+        os << ")";
+    }
+
+    bool eval(Number left, Number right) {
+        switch (token_.tag) {
+            case Tag::kLt: return left < right;
+            case Tag::kEq: return left == right;
+        }
+        std::clog << "Unsupported comparison: " << token_ << std::endl;
+        std::abort();
+    }
+
+    ExprPtr Reduce(Env& env) override {
+        left_ = ReduceIfPossible(left_, env);
+        right_ = ReduceIfPossible(right_, env);
+        NumberExpr* leftNum = dynamic_cast<NumberExpr*>(left_.get());
+        NumberExpr* rightNum = dynamic_cast<NumberExpr*>(right_.get());
+        if (!leftNum) {
+            std::clog << "Not a number: " << left_ << std::endl;
+            return nullptr;
+        }
+        if (!rightNum) {
+            std::clog << "Not a number: " << right_ << std::endl;
+            return nullptr;
+        }
+        Token dummyToken = token_;
+        dummyToken.tag = eval(leftNum->value(), rightNum->value()) ? Tag::kTrue : Tag::kFalse;
+        dummyToken.num = 0;
+        return std::make_shared<BoolExpr>(dummyToken);
+    }
+
+    ExprPtr Clone(std::unordered_map<int, int>& id_map) override {
+        ExprPtr new_left = left_->Clone(id_map);
+        ExprPtr new_right = right_->Clone(id_map);
+        if (!new_left && !new_right) {
+            return nullptr;
+        }
+        return std::make_shared<CompExpr>(
+            token_, new_left ? new_left : left_, new_right ? new_right : right_);
+    }
+
+    ExprPtr Apply(int param_id, ExprPtr arg) override {
+        ExprPtr new_left = left_->Apply(param_id, arg);
+        ExprPtr new_right = right_->Apply(param_id, arg);
+        if (!new_left && !new_right) {
+            return nullptr;
+        }
+        return std::make_shared<CompExpr>(
+            token_, new_left ? new_left : left_, new_right ? new_right : right_);
+    }
+
+protected:
+    ExprPtr left_;
+    ExprPtr right_;
 };
 
 // TODO: Inherit UnaryExpr.
