@@ -6,6 +6,6 @@ steps:
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-f', './Dockerfile.server', '-t', 'judge-dummy:$SHORT_SHA', '.']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['run', ' --name', 'judge-dummy', '-itd', 'judge-dummy:$SHORT_SHA']
+  args: ['run', ' --name', 'judgedummy', '-itd', 'judge-dummy:$SHORT_SHA']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['run', 'client:$SHORT_SHA', './run.sh', 'judge-dummy', 'test_key']
