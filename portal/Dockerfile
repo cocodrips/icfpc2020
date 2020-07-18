@@ -1,8 +1,11 @@
 FROM rust:1.45 as rust-env
 WORKDIR /work
 COPY . ./
+RUN pwd
+RUN ls
 
 WORKDIR /work/_build/modulator
+
 RUN mkdir -p bin
 RUN rustc -O main.rs -o bin/modulator
 
