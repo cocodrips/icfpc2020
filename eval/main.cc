@@ -1,11 +1,13 @@
 #include <algorithm>
 #include <cstdlib>
 #include <memory>
+#include <iostream>
 #include <iterator>
 #include <sstream>
 #include <string>
 #include <vector>
 #include "expr.h"
+#include "logic.h"
 #include "token.h"
 
 bool IsNum(const std::string& str) {
@@ -67,16 +69,20 @@ std::shared_ptr<Expr> CreateExpr(const Token& token) {
         case Tag::kVariable:
             return std::make_shared<GlobalVar>(token);
         case Tag::kApply:
-            return std::make_shared<Apply>(token);
+            return std::make_shared<ApplyExpr>(token);
         case Tag::kAdd:
         case Tag::kDiv:
-        case Tag::kMul:
-            auto left = std::make_shared<FuncParam>(token);
-            auto right = std::make_shared<FuncParam>(token);
-            auto binary = std::make_shared<BinaryExpr>(token, left, right);
-            auto inner = std::make_shared<Func>(token, right, binary);
-            auto outer = std::make_shared<Func>(token, left, inner);
-            return outer;
+        case Tag::kMul: {
+                auto left = std::make_shared<FuncParam>(token);
+                auto right = std::make_shared<FuncParam>(token);
+                auto binary = std::make_shared<BinaryExpr>(token, left, right);
+                auto inner = std::make_shared<Func>(token, right, binary);
+                auto outer = std::make_shared<Func>(token, left, inner);
+                return outer;
+            }
+        case Tag::kTrue:
+        case Tag::kFalse:
+            return std::make_shared<BoolExpr>(token);
     }
     std::clog << "Unsupported token: " << token << " at line " << token.line << std::endl;
     std::abort();
@@ -91,7 +97,7 @@ bool ReduceStack(std::vector<std::shared_ptr<Expr>>& stack) {
     if (!func->built() || !arg->built()) {
         return false;
     }
-    Apply* apply = dynamic_cast<Apply*>(stack[stack.size() - 3].get());
+    ApplyExpr* apply = dynamic_cast<ApplyExpr*>(stack[stack.size() - 3].get());
     if (!apply) {
         return false;
     }
@@ -132,6 +138,13 @@ Env Parse(const std::vector<std::vector<Token>>& lines) {
 int main() {
     std::vector<std::vector<Token>> lines = Tokenize(std::cin);
     Env env = Parse(lines);
-    std::cout << env << std::endl;
+    std::clog << env << std::endl;
+    std::shared_ptr<Expr> reduced = env.last_expr()->Reduce(env);
+    if (!reduced) {
+        std::clog << "Failed to reduce." << std::endl;
+        std::clog << env.last_expr() << std::endl;
+        return 1;
+    }
+    std::cout << reduced << std::endl;
     return 0;
 }
