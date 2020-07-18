@@ -1,36 +1,33 @@
 import os
 
 from flask import Flask, request, render_template, Response
-import subprocess
+from api import demodulator
+from jinja2 import Template, Environment, FileSystemLoader
+
 
 app = Flask(__name__)
 
 
-def demodulate(value):
-    if not value:
-        return ""
-    args = "bin/demodulator"
-    proc = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
-    stdout_value, stderr_value = proc.communicate(value)
-    return stdout_value
-
-
+# web interface
 @app.route('/demodulator')
-def demodulator():
+def demodulator_web():
     value = request.args.get("value")
-    result = demodulate(value)
+    result = demodulator.demodulate(value)
     return render_template("demodulator.html", value=result)
 
 
+# api
 @app.route('/demodulate')
 def demodulator_api():
     value = request.args.get("value")
-    return demodulate(value)
+    return demodulator.demodulate(value)
 
 
 @app.route('/')
 def hello_world():
-    return render_template("index.html")
+    env = Environment(loader=FileSystemLoader('./templates'), trim_blocks=False)
+    template = env.get_template('index.html')
+    return template.render()
 
 
 @app.route('/', defaults={'path': ''})

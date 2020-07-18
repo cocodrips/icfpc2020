@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}
+    demodulator
+{% endblock %}
+
+
+{% block body %}
+    <div class="markdown-body">
+        <p>
+        <form action="/demodulator" method="get">
+            <input type="text" name="value">
+            <input type="submit" value="demodulate">
+        </form>
+        </p>
+        <p>
+        <pre>{{ value }}</pre>
+        </p>
+    </div>
+{% endblock %}
+
+
+
