@@ -28,13 +28,13 @@ def demodulator_web():
 
 @app.route('/visualizer')
 def visualizer_web():
-    vector = request.args.get("vector")
-    width, height, scale, data = visualizer.visualize()
-    return render_template("visualizer.html",
-                           max_width=width, max_height=height,
-                           scale=scale, data=data,
-                           vector=vector)
+    raw_data = request.args.get("raw_data")
 
+    pictures = visualizer.visualize(raw_data)
+
+    return render_template("visualizer.html",
+                           raw_data=raw_data,
+                           pictures=pictures)
 
 # api
 @app.route('/demodulate')
@@ -42,12 +42,10 @@ def demodulator_api():
     value = request.args.get("value")
     return modem.demodulate(value)
 
-
 @app.route('/modulate')
 def modulator_api():
     value = request.args.get("value")
     return modem.modulate(value)
-
 
 @app.route('/interact')
 def interact_api():
@@ -65,7 +63,6 @@ def interact_dummy_api():
     max_index = request.args.get("max_index")
     return interactor.interact(protocol, state, value, max_index, False)
 
-
 @app.route('/protocol/dummy')
 def protocol_dummy_api():
     state = request.args.get("state")
@@ -75,7 +72,6 @@ def protocol_dummy_api():
         "state": state,
         "value": value,
     })
-
 
 @app.route('/protocol/statelessdraw')
 def protocol_statelessdraw_api():
@@ -87,13 +83,11 @@ def protocol_statelessdraw_api():
         "value": value,
     })
 
-
 @app.route('/')
 def hello_world():
     env = Environment(loader=FileSystemLoader('./templates'), trim_blocks=False)
     template = env.get_template('index.html')
     return template.render()
-
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
@@ -120,7 +114,6 @@ def get_resource(path):  # pragma: no cover
     mimetype = mimetypes.get(ext, "text/html")
     content = get_file(complete_path)
     return Response(content, mimetype=mimetype)
-
 
 if __name__ == "__main__":
     import os
