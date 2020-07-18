@@ -9,7 +9,10 @@ setup:
 	mkdir -p bin
 	cp ../demodulator/bin/* bin/.
 
-build: setup
+build:
+	mkdir -p bin
+	mkdir -p _build
+	cp -r ../demodulator _build
 	docker build . -t $(NAME):$(TAG)
 
 push: build
