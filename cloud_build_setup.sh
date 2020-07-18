@@ -1,4 +1,4 @@
 #!/bin/sh
 mkdir -p portal/_build
-cp demodulator portal/_build/
-cp modulator portal/_build/
+cp -r demodulator portal/_build/
+cp -r modulator portal/_build/
