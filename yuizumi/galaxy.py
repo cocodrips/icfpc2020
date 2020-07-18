@@ -155,11 +155,24 @@ def _call(f, x):
     return f._invoke(x)
 
 
+def _pretty_print(x):
+    if x == _Special.NIL:
+        return []
+    if isinstance(x, tuple):
+        car, cdr = x
+        car = _pretty_print(car)
+        cdr = _pretty_print(cdr)
+        if isinstance(cdr, list):
+            return [car] + cdr
+        return (car, cdr)
+    return x
+
+
 def main():
     for line in fileinput.input():
         lhs, _, *rhs = line.split()
         _ENV[lhs] = _Expr(lhs, rhs)
-    print(_reduce(_ENV['galaxy']))
+    print(_pretty_print(_reduce(_ENV['galaxy'])))
 
 
 if __name__ == '__main__':
