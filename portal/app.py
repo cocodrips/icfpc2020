@@ -58,4 +58,6 @@ def get_resource(path):  # pragma: no cover
 
 
 if __name__ == "__main__":
+    import os
+    os.environ["PATH"] = f"{os.environ.get('PATH')}:_build/demodulator/bin"
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))

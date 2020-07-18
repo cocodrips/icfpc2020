@@ -4,15 +4,18 @@ HOST := gcr.io
 PROJECT_ID := icfpc2020-bokuyaba
 IMAGE := $(HOST)/$(PROJECT_ID)/servers/$(NAME):$(TAG)
 
-setup:
-	(cd ../demodulator && make build)
-	mkdir -p bin
-	cp ../demodulator/bin/* bin/.
+clean:
+	rm -rf _build
+	rm -rf bin
 
-build:
-	mkdir -p bin
+setup:
 	mkdir -p _build
 	cp -r ../demodulator _build
+
+build-tools:
+	(cd _build/demodulator && make build)
+
+build: setup
 	docker build . -t $(NAME):$(TAG)
 
 push: build
