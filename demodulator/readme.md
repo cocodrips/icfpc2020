@@ -1,0 +1,4 @@
+- modulate.cpp
+ - g++ demodulate.cpp
+ - ./a.out < test.in > test.out
+ - example : 11110110000110100110110000 -> ( cons ( cons 1 -6 ) ( cons nil nil ) )
