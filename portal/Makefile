@@ -12,7 +12,7 @@ setup:
 	mkdir -p _build
 	cp -r ../demodulator _build
 
-build-tools:
+build-tools: setup
 	(cd _build/demodulator && make build)
 
 build: setup
