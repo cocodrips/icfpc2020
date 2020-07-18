@@ -1,6 +1,6 @@
 import enum
-import fileinput
 import re
+import sys
 
 
 _NUMBER_RE = re.compile('^-?[0-9]+$')
@@ -168,12 +168,13 @@ def _pretty_print(x):
     return x
 
 
-def main():
-    for line in fileinput.input():
+def main(argv):
+    sys.setrecursionlimit(100000)
+    for line in sys.stdin:
         lhs, _, *rhs = line.split()
         _ENV[lhs] = _Expr(lhs, rhs)
-    print(_pretty_print(_reduce(_ENV['galaxy'])))
+    print(_pretty_print(_reduce(_Expr('<input>', argv[1:]))))
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
