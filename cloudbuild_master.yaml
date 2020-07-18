@@ -1,4 +1,8 @@
 steps:
+- name: 'gcr.io/cloud-builders/git'
+  args: ['clone', 'https://github.com/icfpcontest2020/dockerfiles']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-f', './dockerfiles/dockerfiles/python/Dockerfile', '-t', 'gcr.io/$PROJECT_ID/client:$SHORT_SHA', '.']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-f', './Dockerfile.server', '-t', 'gcr.io/$PROJECT_ID/judge-dummy:$SHORT_SHA', '.']
 - name: 'gcr.io/cloud-builders/docker'
@@ -15,3 +19,4 @@ steps:
   - '--platform'
   - 'managed'
   - '--allow-unauthenticated'
+images: ['gcr.io/$PROJECT_ID/client:$SHORT_SHA']
