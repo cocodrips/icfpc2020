@@ -3,4 +3,4 @@ steps:
   args: ['clone', 'https://github.com/icfpcontest2020/dockerfiles']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-f', './dockerfiles/dockerfiles/python/Dockerfile', '-t', 'gcr.io/$PROJECT_ID/client:$SHORT_SHA', '.']
-images: ['gcr.io/$PROJECT_ID/client:$SHORT_SHA', 'gcr.io/$PROJECT_ID/judge-dummy:$SHORT_SHA']
+images: ['gcr.io/$PROJECT_ID/client:$SHORT_SHA']
