@@ -1,3 +1,6 @@
 FROM python
 COPY judge-dummy /judge-dummy
 WORKDIR judge-dummy
+RUN pip install flask
+CMD [python -m main]
+
