@@ -5,12 +5,15 @@
 
 
 {% block body %}
-    <form class="pure-form" action="/demodulator" method="get">
+
+    <form class="pure-form" action="/modem" method="get">
+    <div>
+        <legend class="uk-legend">Demodulator</legend>
+
         <p>
-            <label for="value">binary</label>
-            <textarea class="uk-textarea" name="value" id="" cols="100"
-                      rows="3">{% if base %}{{ base }}{% endif %}</textarea>
-            {#                <input type="submit" value="demodulate">#}
+            <textarea class="uk-textarea uk-width-3-4" name="demodulator-binary" id="" cols="100" placeholder="binary"
+                      rows="3">{% if demodulator_binary %}{{ demodulator_binary }}{% endif %}</textarea>
+
             <button type="submit"
                     class="uk-button uk-button-default uk-button-large">
                 demodulate
@@ -19,13 +22,36 @@
 
 
         <p>
-            <label for="value-textare">result</label>
-            <textarea class="uk-textarea" name="value-textarea" id=""
-                      cols="100"
-                      rows="3">{{ value }}</textarea>
+            <textarea class="uk-textarea" name="demodulator-output" id=""
+                      cols="100" placeholder="result"
+                      rows="3">{{ demodulator_output }}</textarea>
+        </p>
+
+        <legend class="uk-legend">Modulator</legend>
+        <p>
+            <textarea class="uk-textarea uk-width-3-4" name="modulator-list"
+                      id="" cols="100" rows=1 placeholder="list Example:1 2">{% if modulator_list %}{{ modulator_list }}{% endif %}</textarea>
+
+            <button type="submit"
+                    class="uk-button uk-button-default uk-button-large">
+                modulate
+            </button>
         </p>
 
 
+        <p>
+            <textarea class="uk-textarea" name="modulator-output" id=""
+                      cols="100"
+                      rows="2">{{ modulator_output }}</textarea>
+        </p>
+
+        <p>
+            <textarea class="uk-textarea" name="modulator-func" id=""
+                      cols="100"
+                      rows="2">{{ modulator_func }}</textarea>
+        </p>
+
+    </div>
     </form>
 
 {% endblock %}
