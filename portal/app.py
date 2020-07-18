@@ -1,9 +1,8 @@
 import os
 
 from flask import Flask, request, render_template, Response
-from api import demodulator
+from api import demodulator, visualizer
 from jinja2 import Template, Environment, FileSystemLoader
-
 
 app = Flask(__name__)
 
@@ -13,7 +12,17 @@ app = Flask(__name__)
 def demodulator_web():
     value = request.args.get("value")
     result = demodulator.demodulate(value)
-    return render_template("demodulator.html", value=result)
+    return render_template("demodulator.html", base=value, value=result)
+
+
+@app.route('/visualizer')
+def visualizer_web():
+    vector = request.args.get("vector")
+    width, height, scale, data = visualizer.visualize()
+    return render_template("visualizer.html",
+                           max_width=width, max_height=height,
+                           scale=scale, data=data,
+                           vector=vector)
 
 
 # api
@@ -59,5 +68,6 @@ def get_resource(path):  # pragma: no cover
 
 if __name__ == "__main__":
     import os
+
     os.environ["PATH"] = f"{os.environ.get('PATH')}:_build/demodulator/bin"
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
