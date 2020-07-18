@@ -13,8 +13,13 @@ setup:
 	cp -r ../demodulator _build
 	cp -r ../modulator _build
 
-build-tools:
+local-tool-build: setup
+	mkdir -p bin
 	(cd _build/demodulator && make build)
+	(cd _build/modulator && make build)
+	cp _build/demodulator/bin/demodulator bin
+	cp _build/modulator/bin/modulator bin
+
 
 build: setup
 	docker build . -t $(NAME):$(TAG)

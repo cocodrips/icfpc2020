@@ -1,7 +1,7 @@
 import os
 
 from flask import Flask, request, render_template, Response
-from api import demodulator, visualizer, interactor
+from api import modem, visualizer, interactor
 from jinja2 import Template, Environment, FileSystemLoader
 import json
 
@@ -9,11 +9,21 @@ app = Flask(__name__)
 
 
 # web interface
-@app.route('/demodulator')
+@app.route('/modem')
 def demodulator_web():
-    value = request.args.get("value")
-    result = demodulator.demodulate(value)
-    return render_template("demodulator.html", base=value, value=result)
+    demodulator_binary = request.args.get("demodulator-binary")
+    demodulator_output = modem.demodulate(demodulator_binary)
+
+    modulator_list = request.args.get("modulator-list")
+    modulator_output = modem.modulate(modulator_list)
+    modulator_func = modem.demodulate(modulator_output)
+    print(modulator_output)
+    return render_template("modem.html",
+                           demodulator_binary=demodulator_binary,
+                           demodulator_output=demodulator_output,
+                           modulator_list=modulator_list,
+                           modulator_output=modulator_output,
+                           modulator_func=modulator_func)
 
 
 @app.route('/visualizer')
@@ -30,7 +40,14 @@ def visualizer_web():
 @app.route('/demodulate')
 def demodulator_api():
     value = request.args.get("value")
-    return demodulator.demodulate(value)
+    return modem.demodulate(value)
+
+
+@app.route('/modulate')
+def modulator_api():
+    value = request.args.get("value")
+    return modem.modulate(value)
+
 
 @app.route('/interact')
 def interact_api():
@@ -48,24 +65,28 @@ def interact_dummy_api():
     max_index = request.args.get("max_index")
     return interactor.interact(protocol, state, value, max_index, False)
 
+
 @app.route('/protocol/dummy')
 def protocol_dummy_api():
     state = request.args.get("state")
     value = request.args.get("value")
     return json.dumps({
-        "flag": 1, 
-        "state": state, 
+        "flag": 1,
+        "state": state,
         "value": value,
-        })
+    })
+
+
 @app.route('/protocol/statelessdraw')
 def protocol_statelessdraw_api():
     state = request.args.get("state")
     value = request.args.get("value")
     return json.dumps({
-        "flag": 0, 
-        "state": 0, 
+        "flag": 0,
+        "state": 0,
         "value": value,
-        })
+    })
+
 
 @app.route('/')
 def hello_world():
@@ -104,5 +125,5 @@ def get_resource(path):  # pragma: no cover
 if __name__ == "__main__":
     import os
 
-    os.environ["PATH"] = f"{os.environ.get('PATH')}:_build/demodulator/bin"
+    os.environ["PATH"] = f"{os.environ.get('PATH')}:bin"
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
