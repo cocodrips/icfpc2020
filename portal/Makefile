@@ -11,8 +11,9 @@ clean:
 setup:
 	mkdir -p _build
 	cp -r ../demodulator _build
+	cp -r ../modulator _build
 
-build-tools: setup
+build-tools:
 	(cd _build/demodulator && make build)
 
 build: setup
