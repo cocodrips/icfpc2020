@@ -6,15 +6,21 @@
 
 {% block body %}
     <div class="markdown-body">
-        <p>
+
         <form action="/demodulator" method="get">
             <input type="text" name="value">
             <input type="submit" value="demodulate">
         </form>
-        </p>
-        <p>
+
+
+        base:
+        <pre>{% if base %}{{ base }}{% endif %}</pre>
+
+
+
+        demodulate:
         <pre>{{ value }}</pre>
-        </p>
+
     </div>
 {% endblock %}
 

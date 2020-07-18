@@ -13,8 +13,11 @@ app = Flask(__name__)
 def demodulator_web():
     value = request.args.get("value")
     result = demodulator.demodulate(value)
-    return render_template("demodulator.html", value=result)
+    return render_template("demodulator.html", base=value, value=result)
 
+@app.route('/visualizer')
+def visualizer_web():
+    pass
 
 # api
 @app.route('/demodulate')
