@@ -1,4 +1,5 @@
 ## Menu
+- [visualizer](/visualizer)
 - [demodulator](/demodulator)
 
 ## API
