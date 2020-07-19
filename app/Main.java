@@ -3,18 +3,13 @@ import java.net.http.*;
 import yuizumi.eval.*;
 
 class Main {
-    public static void main(String[] args) throws Exception {
+    public static Expr sendQuery(String serverUrl, Expr requestExpr) {
         try {
-            var serverUrl = args[0];
-            var playerKey = args[1];
-
-            System.out.println("ServerUrl: " + serverUrl + "; PlayerKey: " + playerKey);
-            System.out.println(Modulator.modulate(Nil.EXPR));
-
+            var bits = Modulator.modulate(requestExpr);
             var request = HttpRequest.newBuilder()
-                    .uri(URI.create(serverUrl))
+                    .uri(URI.create(serverUrl + "/aliens/send"))
                     .version(HttpClient.Version.HTTP_1_1)
-                    .POST(HttpRequest.BodyPublishers.ofString(playerKey))
+                    .POST(HttpRequest.BodyPublishers.ofString(bits))
                     .build();
 
             var response = HttpClient.newHttpClient()
@@ -28,12 +23,24 @@ class Main {
                 System.out.println("Response body: " + response.body());
                 System.exit(2);
             }
-
             System.out.println("Server response: " + response.body());
+            return Demodulator.demodulate(response.body());
         } catch (Exception e) {
             System.out.println("Unexpected server response:");
             e.printStackTrace(System.out);
             System.exit(1);
         }
+        throw new RuntimeException();
+    }
+
+    public static void main(String[] args) throws Exception {
+        String serverUrl = args[0];
+        int playerKey = Integer.parseInt(args[1]);
+        Expr req0 = new Pair(
+            yuizumi.eval.Number.of(2),
+            new Pair(yuizumi.eval.Number.of(playerKey),
+            Nil.EXPR));
+        Expr res0 = sendQuery(serverUrl, req0);
+        System.out.println(res0);
     }
 }
