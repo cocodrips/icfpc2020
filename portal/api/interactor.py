@@ -2,6 +2,21 @@ import urllib.request
 import json
 import time
 
+def apapnize(e):
+    ty = type(e)
+    if ty == tuple:
+        if len(e) != 2:
+            raise ValueError('input contains tuple of size not 2')
+        return 'ap ap cons {} {}'.format(apapnize(e[0]), apapnize(e[1]))
+    elif ty == list:
+        if len(e) == 0:
+            return 'nil'
+        return 'ap ap cons {} {}'.format(apapnize(e[0]), apapnize(e[1:]))
+    elif ty == int:
+        return e
+    else:
+        raise ValueError('input contains unknown expression')
+
 def send_query(bit, is_real):
     if is_real:
         url = 'https://icfpc2020-api.testkontur.ru/aliens/send'
@@ -23,18 +38,24 @@ def send_query(bit, is_real):
         #info = res.info()
     return body, code
 
-def call_protocol(protocol, state, bit):
+def call_protocol(protocol, state, value):
     url = "http://localhost:8080/protocol/" + protocol
+    
+    if state == "nil":
+        state_a = state
+    else:
+        parsed = eval(state)
+        state_a = apapnize(parsed)
+    p_value = eval(value)
+    value_a = apapnize(p_value)
     params = {
-    'state': state,
-    'value': bit,
+        'value': "ap_ap_galaxy_"+state_a.replace(" ", "_")+"_"+value_a.replace(" ", "_"),
     }
-
     req = urllib.request.Request('{}?{}'.format(url, urllib.parse.urlencode(params)))
     with urllib.request.urlopen(req) as res:
         body = res.read().decode('utf-8')
-    body_d = json.loads(body)
-    return body_d["flag"], body_d["state"], body_d["value"]
+    #body_d = json.loads(body)
+    return body.replace(" ", "")
 
 def interact(protocol, state, value, max_index, is_real):
     index=0
@@ -50,7 +71,8 @@ def interact(protocol, state, value, max_index, is_real):
     else:
         max_index=int(max_index)
     while True:
-        flag, new_state, data = call_protocol(protocol, state, value)
+        data = call_protocol(protocol, state, value)
+        return data
         new_log={}
         new_log["index"]=index
         new_log["query"]=data

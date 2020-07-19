@@ -26,6 +26,18 @@ def demodulator_web():
                            modulator_output=modulator_output,
                            modulator_func=modulator_func)
 
+@app.route('/galaxy')
+def demodulator_web():
+    state
+    gal_state = request.args.get("gal_state")
+    gal_var = request.args.get("gal_var")
+    galaxy_output = interactor.interact("galaxy", gal_state, gal_var, 0, False)
+
+    print(galaxy_output)
+    return render_template("galaxy.html",
+            gal_state=gal_state,
+            gal_var=gal_var,
+            galaxy_output=galaxy_output)
 
 @app.route('/visualizer')
 def visualizer_web():
