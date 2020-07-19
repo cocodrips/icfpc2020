@@ -22,7 +22,7 @@ def modulate(e):
     n_4bits = (n_bits + 3) // 4
     bits = '{:064b}'.format(e)
 
-    return '01{}0{}'.format('1' * n_4bits, bits[64 - 4 * n_4bits:])
+    return '{}{}0{}'.format(header, '1' * n_4bits, bits[64 - 4 * n_4bits:])
   else:
     raise ValueError('input contains unknown expression')
 
