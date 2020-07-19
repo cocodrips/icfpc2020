@@ -88,7 +88,7 @@ def main():
     demod_res = demodulate(res)
     ev.event_logging("join", query, mod_query, res, code, demod_res)
 
-    query="[3,"+player_key+",[300,0,0,2]]"
+    query="[3,"+player_key+",[300,0,0,1]]"
     mod_query = modulate(query)
     res, code = send_query(server_url, mod_query, False)
     demod_res = demodulate(res)
