@@ -2,8 +2,11 @@ import numpy as np
 from dataclasses import dataclass
 
 
+scale_base = 500
 class Picture():
-    def __init__(self, index, points):
+    def __init__(self, image_id, state, index, points):
+        self.image_id = image_id
+        self.state = state
         self.index = index
         self.points = points
         self.xmin, self.ymin, self.xmax, self.ymax = 0, 0, 0, 0
@@ -22,13 +25,17 @@ class Picture():
 
     @property
     def scale(self):
-        return 200 / self.height()
+        return scale_base / self.height
 
 
 class Pictures():
     def __init__(self, pictures: [Picture]):
         self.pictures = pictures
         self._width, self._height = None, None
+
+    @property
+    def image_ids(self):
+        return sorted(list(set([p.image_id for p in self.pictures])))
 
     @property
     def xmin(self):
@@ -60,7 +67,7 @@ class Pictures():
 
     @property
     def scale(self):
-        return 200 / self.height
+        return scale_base / self.height
 
 
 def visualize(raw_data):
@@ -69,16 +76,23 @@ def visualize(raw_data):
     """
     if raw_data is None:
         return Pictures([])
-    flag, state, image_data = eval(raw_data)
 
     pictures = []
-    for i, image in enumerate(image_data):
-
-        points = np.array(image)
-        pictures.append(Picture(i, points))
+    for line in raw_data.split('\n'):
+        if not line:
+            continue
+        flag, state, image_data = eval(line)
+        for i, image in enumerate(image_data):
+            points = np.array(image)
+            pictures.append(Picture(state[0], state[1][0], i, points))
 
     return Pictures(pictures)
 
 
 if __name__ == '__main__':
-    print(visualize())
+    raw_data="""[0, [0, [1], 0, []], [[(-1, -3), (0, -3), (1, -3), (2, -2), (-2, -1), (-1, -1), (0, -1), (3, -1), (-3, 0), (-1, 0), (1, 0), (3, 0), (-3, 1), (0, 1), (1, 1), (2, 1), (-2, 2), (-1, 3), (0, 3), (1, 3)], [(-7, -2), (-7, -3), (-8, -2)], []]]
+[0, [1, [1], 0, []], [[(-3, -3), (-2, -3), (-1, -3), (0, -3), (1, -3), (2, -3), (3, -3), (-3, -2), (0, -2), (3, -2), (-3, -1), (0, -1), (3, -1), (-3, 0), (-2, 0), (-1, 0), (0, 0), (1, 0), (2, 0), (3, 0), (-3, 1), (0, 1), (3, 1), (-3, 2), (0, 2), (3, 2), (-3, 3), (-2, 3), (-1, 3), (0, 3), (1, 3), (2, 3), (3, 3)]]]
+[0, [1, [2], 0, []], [[(0, -3), (-1, -3), (-2, -3), (-3, -3), (0, 0), (-1, 0), (-2, 0), (-3, 0), (-3, 0), (-3, -1), (-3, -2), (-3, -3), (0, -1), (0, -2), (0, -3)], [(1, -3), (2, -3), (3, -3), (3, -2), (3, -1), (1, 0), (2, 0), (3, 0)], [(0, 1), (3, 1), (0, 2), (3, 2), (0, 3), (1, 3), (2, 3), (3, 3)], [(-3, 1), (-3, 2), (-3, 3), (-2, 3), (-1, 3)]]]
+"""
+    print(visualize(raw_data))
+
