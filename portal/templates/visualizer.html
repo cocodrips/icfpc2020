@@ -20,6 +20,40 @@
     </form>
 
     <div class="uk-grid uk-margin">
+    <div class="uk-width-1-2">
+        <p class="uk-margin-small">
+            all
+        </p>
+        <canvas id="canvas-all"
+                width="{{ pictures.width * pictures.scale }}"
+                height="{{ pictures.height * pictures.scale }}"></canvas>
+        <script>
+            console.log("{{ pictures.ymin }}~{{ pictures.ymax }}, {{ pictures.xmin }}~{{ pictures.xmax }}")
+            var canvas = document.getElementById("canvas-all");
+            var context = canvas.getContext("2d");
+            context.scale({{ pictures.scale }}, {{ pictures.scale }});
+
+            context.fillStyle = "black";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+
+            context.fillStyle = "#666";
+            context.fillRect({{ -pictures.xmin }}, {{ -pictures.ymin }}, 1, 1);
+
+            context.fillStyle = "#20cfcd";
+            context.globalAlpha = 0.2;
+
+            {% for picture in pictures.pictures %}
+                {% for point in picture.points %}
+                    context.fillRect({{ point[0] - pictures.xmin }}, {{ point[1] - pictures.ymin }}, 1, 1);
+                {% endfor %}
+            {% endfor %}
+        </script>
+
+    </div>
+    </div>
+    <div class="uk-grid uk-margin">
+
+
         {% for picture in pictures.pictures %}
 
             <div class="uk-width-1-3">
@@ -47,7 +81,6 @@
                 {% for point in picture.points %}
                     context.fillRect({{ point[0] - pictures.xmin }}, {{ point[1] - pictures.ymin }}, 1, 1);
                 {% endfor %}
-
                 context.fillStyle = "#666";
                 context.fillRect({{ -pictures.xmin }}, {{ -pictures.ymin }}, 1, 1);
 
