@@ -31,6 +31,6 @@ public class Main {
         }
 
         Expr result = (new UserFunc("$main", args, env)).reduceToData();
-        System.out.println(result);
+        System.out.println(PrettyPrinter.toPrettyString(result));
     }
 }
