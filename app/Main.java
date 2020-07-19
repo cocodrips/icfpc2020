@@ -122,8 +122,16 @@ class Main {
             long posY = cdr(position).asNumber().value;
             long velX = car(velocity).asNumber().value;
             long velY = cdr(velocity).asNumber().value;
-            long accX = decideAcc(posX, velX, sign(posX), sign(posY));
-            long accY = decideAcc(posY, velY, sign(posY), -sign(posX));
+            long accX = Math.abs(posX) > 70
+                ? sign(posX)
+                : (Math.abs(posX) > 50
+                    ? 0
+                    : (Math.abs(velX) < 8 ? sign(posY) : 0));
+            long accY = Math.abs(posX) > 70
+                ? sign(posY)
+                : (Math.abs(posY) > 50
+                    ? 0
+                    : (Math.abs(velY) < 8 ? -sign(posX) : 0));
             Expr acc = cons(accX, accY);
             Expr command = cons(0, cons(shipId, cons(acc, NIL)));
 
@@ -131,10 +139,10 @@ class Main {
             if (role == 0 && accX == 0 && accY == 0 && otherShip != null) {
                 Expr otherPos = idx(otherShip, 2); // vector
                 Expr otherVel = idx(otherShip, 3); // vector
-                long otherPosX = car(position).asNumber().value;
-                long otherPosY = cdr(position).asNumber().value;
-                long otherVelX = car(velocity).asNumber().value;
-                long otherVelY = cdr(velocity).asNumber().value;
+                long otherPosX = car(otherPos).asNumber().value;
+                long otherPosY = cdr(otherPos).asNumber().value;
+                long otherVelX = car(otherVel).asNumber().value;
+                long otherVelY = cdr(otherVel).asNumber().value;
                 Expr target = cons(
                     otherPosX + otherVelX + random.nextInt(2) - 1,
                     otherPosY + otherVelY + random.nextInt(2) - 1);
@@ -147,27 +155,7 @@ class Main {
             System.out.println(PrettyPrinter.toPrettyString(gameRes));
         }
     }
-
-    private static long decideAcc(long pos, long vel, long to_center, long rotate) {
-        if (Math.abs(pos) > 70) {
-            return to_center;
-        }
-        if (Math.abs(pos) < 20) {
-            return -to_center;
-        }
-        if (Math.abs(pos) > 50) {
-            return 0;
-        }
-        if (Math.abs(vel) >= 10) {
-            return sign(vel);
-        }
-        if (Math.abs(vel) >= 8) {
-            return 0;
-        }
-        return rotate;
-    }
-
-    private static long sign(long num) {
+    static long sign(long num) {
         return num < 0 ? -1 : (num > 0 ? 1 : 0);
     }
 }
