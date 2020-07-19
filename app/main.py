@@ -54,7 +54,7 @@ def main():
     res, code = send_query(server_url, mod_join, False)
     print('Server response: {} code: {}'.format( res, code))
 
-    mod_join = modulate("4 "+player_key)
+    mod_join = modulate("4 "+player_key)[:-2]+"110000"
     print("Command query: {}".format(mod_join))
     res, code = send_query(server_url, mod_join, False)
     print('Server response: {} code: {}'.format( res, code))
