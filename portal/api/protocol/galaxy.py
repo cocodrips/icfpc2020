@@ -168,13 +168,13 @@ def _pretty_print(x):
     return x
 
 
-def main(argv):
+def convert(arg):
     sys.setrecursionlimit(100000)
-    with open("galaxy.txt") as f:
+    with open("/app/api/protocol/galaxy.txt") as f:
         for line in f:
             lhs, _, *rhs = line.split()
             _ENV[lhs] = _Expr(lhs, rhs)
-    print(_pretty_print(_reduce(_Expr('<input>', argv[1:]))))
+    return str(_pretty_print(_reduce(_Expr('<input>', arg))))
 
 
 if __name__ == '__main__':

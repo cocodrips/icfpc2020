@@ -2,6 +2,7 @@ import os
 
 from flask import Flask, request, render_template, Response
 from api import modem, visualizer, interactor
+from api.protocol import galaxy
 from jinja2 import Template, Environment, FileSystemLoader
 import json
 
@@ -82,6 +83,12 @@ def protocol_statelessdraw_api():
         "state": 0,
         "value": value,
     })
+
+@app.route('/protocol/galaxy')
+def protocol_galaxy_api():
+    value = request.args.get("value")
+    return galaxy.convert(value.split("_"))
+
 
 @app.route('/')
 def hello_world():
