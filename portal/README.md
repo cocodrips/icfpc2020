@@ -1,6 +1,7 @@
 ## Menu
 - [visualizer](/visualizer)
 - [modem](/modem)
+- [galaxy](/galaxy)
 
 ## API
 
