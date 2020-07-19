@@ -37,9 +37,11 @@ def galaxy_web():
             gal_var=gal_var,
             galaxy_output=galaxy_output)
 
-@app.route('/visualizer')
+@app.route('/visualizer', methods=["GET", "POST"])
 def visualizer_web():
-    raw_data = request.args.get("raw_data")
+    raw_data = request.form.get("raw_data")
+    print(raw_data)
+    # raw_data = request.args.get("raw_data")
 
     pictures = visualizer.visualize(raw_data)
 
