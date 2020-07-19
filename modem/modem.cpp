@@ -3,14 +3,12 @@
 #include <stack>
 #include <cctype>
 #include <cmath>
+#include <sstream>
 
 class Modem {
   public:
     void init() {
-      std::string token;
-      while (std::cin>>token) {
-        input += token;
-      }
+      std::cin>>input;
     }
     void init(std::string in) {
       input = in;
@@ -55,7 +53,7 @@ class Modulator : public Modem {
       }
     }
     
-    void get_msb(const int number, int& msb) {
+    void get_msb(const long long number, int& msb) {
       for (int i=63;i>=0;i--) {
          if (number & (1LL<<i)) {
            msb = i+1;
@@ -81,7 +79,7 @@ class Modulator : public Modem {
       int msb = 0;
       get_msb(number, msb);
       int cbit = msb % 4;
-      cbit = (msb - msb%4) / 4 + 1;
+      cbit = ((msb - msb%4) / 4) + 1;
       write_cbit_header(cbit);
       for (int i=cbit*4-1;i>=0;i--) {
         if (number & (1LL<<i)) {
