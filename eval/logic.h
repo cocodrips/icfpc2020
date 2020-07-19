@@ -7,6 +7,7 @@
 #include <vector>
 #include "token.h"
 #include "expr.h"
+#include "list.h"
 
 class IfExpr;
 
@@ -61,11 +62,11 @@ public:
         NumberExpr* leftNum = dynamic_cast<NumberExpr*>(left_.get());
         NumberExpr* rightNum = dynamic_cast<NumberExpr*>(right_.get());
         if (!leftNum) {
-            std::clog << "Not a number: " << left_ << std::endl;
+            std::clog << "CompExpr: Not a number: " << left_ << std::endl;
             return nullptr;
         }
         if (!rightNum) {
-            std::clog << "Not a number: " << right_ << std::endl;
+            std::clog << "CompExpr: Not a number: " << right_ << std::endl;
             return nullptr;
         }
         Token dummyToken = token_;
@@ -100,9 +101,9 @@ protected:
 };
 
 // TODO: Inherit UnaryExpr.
-class If0Expr : public Expr {
+class IsXExpr : public Expr {
 public:
-    If0Expr(const Token& token, ExprPtr expr) : Expr(token), expr_(expr) {}
+    IsXExpr(const Token& token, ExprPtr expr) : Expr(token), expr_(expr) {}
     void Output(std::ostream& os) const override {
         os << token_ << "(";
         expr_->Output(os);
@@ -111,13 +112,22 @@ public:
 
     ExprPtr Reduce(Env& env) override {
         expr_ = ReduceIfPossible(expr_, env);
-        NumberExpr* num_expr = dynamic_cast<NumberExpr*>(expr_.get());
-        if (!num_expr) {
-            std::clog << "Not a number: " << expr_ << std::endl;
+        bool result = false;
+        if (token_.tag == Tag::kIf0) {
+            NumberExpr* num_expr = dynamic_cast<NumberExpr*>(expr_.get());
+            if (num_expr && num_expr->value() == 0) {
+                result = true;
+            }
+        } else if (token_.tag == Tag::kIsNil) {
+            if (dynamic_cast<NilExpr*>(expr_.get())) {
+                result = true;
+            }
+        } else {
+            std::clog << "Unsupported IsXExpr: " << token_ << std::endl;
             return nullptr;
         }
         Token dummyToken = token_;
-        dummyToken.tag = num_expr->value() == 0 ? Tag::kTrue : Tag::kFalse;
+        dummyToken.tag = result ? Tag::kTrue : Tag::kFalse;
         return std::make_shared<BoolExpr>(dummyToken);
     }
     
@@ -126,7 +136,7 @@ public:
         if (!new_expr) {
             return nullptr;
         }
-        return std::make_shared<If0Expr>(token_, new_expr ? new_expr : expr_);
+        return std::make_shared<IsXExpr>(token_, new_expr ? new_expr : expr_);
     }
 
     ExprPtr Apply(int param_id, ExprPtr arg) override {
@@ -134,7 +144,7 @@ public:
         if (!new_expr) {
             return nullptr;
         }
-        return std::make_shared<If0Expr>(token_, new_expr ? new_expr : expr_);
+        return std::make_shared<IsXExpr>(token_, new_expr ? new_expr : expr_);
     }
 
 protected:

@@ -6,9 +6,8 @@
 #include <memory>
 #include <vector>
 #include <unordered_map>
+#include "flag.h"
 #include "token.h"
-
-bool enable_verbose_log = false;
 
 class Expr;
 typedef std::shared_ptr<Expr> ExprPtr;
@@ -118,12 +117,12 @@ ExprPtr ReduceIfPossible(ExprPtr expr, Env& env) {
     }
     ExprPtr reduced = expr->Reduce(env);
     if (!reduced) {
-        if (enable_verbose_log) {
+        if (FLAG_log_verbose) {
             std::clog << "Not reduced: " << std::endl << expr << std::endl << std::endl;
         }
         return expr;
     }
-    if (enable_verbose_log) {
+    if (FLAG_log_verbose) {
         std::clog << "Reduced:"<< std::endl;
         std::clog << expr << std::endl << reduced << std::endl << std::endl;
     }
@@ -231,7 +230,9 @@ public:
         // arg_ = ReduceIfPossible(arg_, env);
         ExprPtr applied = func_->Apply(arg_);
         if (!applied) {
-            std::clog << "Not a function: " << func_ << std::endl;
+            if (FLAG_log_warning) {
+                std::clog << "Not a function: " << func_ << std::endl;
+            }
             return nullptr;
         }
         return ReduceIfPossible(applied, env);
@@ -315,11 +316,15 @@ public:
         NumberExpr* leftNum = dynamic_cast<NumberExpr*>(left_.get());
         NumberExpr* rightNum = dynamic_cast<NumberExpr*>(right_.get());
         if (!leftNum) {
-            std::clog << "Not a number: " << left_ << std::endl;
+            if (FLAG_log_warning) {
+                std::clog << "BinaryExpr: Not a number: " << left_ << std::endl;
+            }
             return nullptr;
         }
         if (!rightNum) {
-            std::clog << "Not a number: " << right_ << std::endl;
+            if (FLAG_log_warning) {
+                std::clog << "BinaryExpr: Not a number: " << right_ << std::endl;
+            }
             return nullptr;
         }
         Token dummyToken = token_;
@@ -378,7 +383,9 @@ public:
         expr_ = ReduceIfPossible(expr_, env);
         NumberExpr* num_expr = dynamic_cast<NumberExpr*>(expr_.get());
         if (!num_expr) {
-            std::clog << "Not a number: " << expr_ << std::endl;
+            if (FLAG_log_warning) {
+                std::clog << "UnaryExpr: Not a number: " << expr_ << std::endl;
+            }
             return nullptr;
         }
         Token dummyToken = token_;

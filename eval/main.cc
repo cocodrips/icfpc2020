@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include "expr.h"
+#include "list.h"
 #include "logic.h"
 #include "token.h"
 
@@ -78,9 +79,8 @@ ExprPtr CreateExpr(const Token& token) {
                 auto left = std::make_shared<FuncParam>(token);
                 auto right = std::make_shared<FuncParam>(token);
                 auto binary = std::make_shared<BinaryExpr>(token, left, right);
-                auto inner = std::make_shared<Func>(token, right, binary);
-                auto outer = std::make_shared<Func>(token, left, inner);
-                return outer;
+                return std::make_shared<Func>(token, left,
+                    std::make_shared<Func>(token, right, binary));
         }
         case Tag::kEq:
         case Tag::kLt: {
@@ -89,6 +89,21 @@ ExprPtr CreateExpr(const Token& token) {
                 auto comp = std::make_shared<CompExpr>(token, left, right);
                 return std::make_shared<Func>(token, left,
                     std::make_shared<Func>(token, right, comp));
+        }
+        case Tag::kNil:
+            return std::make_shared<NilExpr>(token);
+        case Tag::kCons: {
+                auto left = std::make_shared<FuncParam>(token);
+                auto right = std::make_shared<FuncParam>(token);
+                auto cons = std::make_shared<ConsExpr>(token, left, right);
+                return std::make_shared<Func>(token, left,
+                    std::make_shared<Func>(token, right, cons));
+        }
+        case Tag::kCar:
+        case Tag::kCdr: {
+                auto param = std::make_shared<FuncParam>(token);
+                auto carCdr = std::make_shared<CarCdrExpr>(token, param);
+                return std::make_shared<Func>(token, param, carCdr);
         }
         case Tag::kNeg:
         case Tag::kPwr2:
@@ -102,15 +117,11 @@ ExprPtr CreateExpr(const Token& token) {
         case Tag::kTrue:
         case Tag::kFalse:
             return std::make_shared<BoolExpr>(token);
-        case Tag::kIf0: {
+        case Tag::kIf0:
+        case Tag::kIsNil: {
                 auto param = std::make_shared<FuncParam>(token);
-                auto cond = std::make_shared<If0Expr>(token, param);
-                auto left = std::make_shared<FuncParam>(token);
-                auto right = std::make_shared<FuncParam>(token);
-                auto if_expr = std::make_shared<IfExpr>(token, cond, left, right);
                 return std::make_shared<Func>(token, param,
-                    std::make_shared<Func>(token, left,
-                    std::make_shared<Func>(token, right, if_expr)));
+                    std::make_shared<IsXExpr>(token, param));
         }
         case Tag::kSCombinator: {
             // ap ap ap s x0 x1 x2 = ap ap x0 x2 ap x1 x2
@@ -198,10 +209,13 @@ Env Parse(const std::vector<std::vector<Token>>& lines) {
     return env;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+    ParseFlags(argc, argv);
     std::vector<std::vector<Token>> lines = Tokenize(std::cin);
     Env env = Parse(lines);
-    std::clog << env << std::endl;
+    if (FLAG_log_tokens) {
+        std::clog << env << std::endl;
+    }
     ExprPtr reduced = env.last_expr()->Reduce(env);
     if (!reduced) {
         std::clog << "Failed to reduce." << std::endl;
