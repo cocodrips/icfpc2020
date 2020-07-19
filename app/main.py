@@ -6,6 +6,7 @@ import dataclasses
 from typing import List
 from dataclasses import field
 import json
+import time 
 
 def send_query(url, bit, is_real):
     #if is_real:
@@ -94,11 +95,13 @@ def main():
     demod_res = demodulate(res)
     ev.event_logging("start", query, mod_query, res, code, demod_res)
 
-    query="[4,"+player_key+",[0,1,[10,10]]]]"
-    mod_query = modulate(query)
-    res, code = send_query(server_url, mod_query, False)
-    demod_res = demodulate(res)
-    ev.event_logging("command", query, mod_query, res, code, demod_res)
+    while True:
+        query="[4,"+player_key+",nil]"
+        mod_query = modulate(query)
+        res, code = send_query(server_url, mod_query, False)
+        demod_res = demodulate(res)
+        ev.event_logging("command", query, mod_query, res, code, demod_res)
+        time.sleep(0.4)
 
     ev.print_logs()
 
