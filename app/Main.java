@@ -1,5 +1,6 @@
 import java.net.*;
 import java.net.http.*;
+import yuizumi.eval.*;
 
 class Main {
     public static void main(String[] args) throws Exception {
@@ -8,6 +9,7 @@ class Main {
             var playerKey = args[1];
 
             System.out.println("ServerUrl: " + serverUrl + "; PlayerKey: " + playerKey);
+            System.out.println(Modulator.modulate(Nil.EXPR));
 
             var request = HttpRequest.newBuilder()
                     .uri(URI.create(serverUrl))

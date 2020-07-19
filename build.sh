@@ -1,7 +1,7 @@
 #!/bin/sh
 
-cd app
-javac -d build *.java
+javac -d app/build yuizumi/eval/*.java
+javac -d app/build app/*.java
 
-cd build
+cd app/build
 jar cfe Main.jar Main *
