@@ -82,9 +82,10 @@ def visualize(raw_data):
         if not line:
             continue
         flag, state, image_data = eval(line.replace('nil', '[]'))
-        for i, image in enumerate(image_data):
-            points = np.array(image)
-            pictures.append(Picture(state[0], state[1][0], i, points))
+        if flag == 0:
+            for i, image in enumerate(image_data):
+                    points = np.array(image)
+                    pictures.append(Picture(state[0], state[1][0], i, points))
 
     return Pictures(pictures)
 
