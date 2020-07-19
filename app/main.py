@@ -24,14 +24,6 @@ def send_query(url, bit, is_real):
     return body.strip(), code
 
 def modulate(text):
-    url = "https://portal-prtffs3u5a-uw.a.run.app/modulate"
-    params = {
-    'value': text,
-    }
-
-    req = urllib.request.Request('{}?{}'.format(url, urllib.parse.urlencode(params)))
-    with urllib.request.urlopen(req) as res:
-        body = res.read().decode('utf-8').strip()
     return body
 
 def main():
