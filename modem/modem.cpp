@@ -81,6 +81,7 @@ class Modulator : public Modem {
       int cbit = msb % 4;
       cbit = ((msb - msb%4) / 4) + 1;
       write_cbit_header(cbit);
+      //std::cout<<number<<" "<<msb<<" "<<cbit<<std::endl;
       for (int i=cbit*4-1;i>=0;i--) {
         if (number & (1LL<<i)) {
           output += "1";
@@ -156,7 +157,8 @@ class Modulator : public Modem {
               return false;
             }
             if (input[pointer] == ']') {
-              output += "nil";
+              pointer++;
+              output += "00";
             } else {
               output += "11";
               stack.push(3);
@@ -200,6 +202,9 @@ class Modulator : public Modem {
 class Demodulator : public Modem {
   public:
     std::string str(long long num) {
+      if (num == 0) {
+        return "0";
+      }
       std::string ret = "";
       while(num != 0LL) {
         ret = std::string{(char)(num%10 + '0')} + ret;
