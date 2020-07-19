@@ -10,12 +10,12 @@ app = Flask(__name__)
 
 
 # web interface
-@app.route('/modem')
+@app.route('/modem', methods=["GET", "POST"])
 def demodulator_web():
-    demodulator_binary = request.args.get("demodulator-binary")
+    demodulator_binary = request.form.get("demodulator-binary")
     demodulator_output = modem.demodulate(demodulator_binary)
 
-    modulator_list = request.args.get("modulator-list")
+    modulator_list = request.form.get("modulator-list")
     modulator_output = modem.modulate(modulator_list)
     modulator_func = modem.demodulate(modulator_output)
     print(modulator_output)

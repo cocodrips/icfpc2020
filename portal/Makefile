@@ -13,9 +13,7 @@ setup:
 
 local-tool-build: setup
 	mkdir -p bin
-	(cd _build/demodulator && make build)
 	(cd _build/modem && make build)
-	cp _build/demodulator/bin/demodulator bin
 	cp _build/modem/bin/modem bin
 
 
