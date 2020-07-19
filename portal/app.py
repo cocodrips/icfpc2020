@@ -40,9 +40,6 @@ def galaxy_web():
 @app.route('/visualizer', methods=["GET", "POST"])
 def visualizer_web():
     raw_data = request.form.get("raw_data")
-    print(raw_data)
-    # raw_data = request.args.get("raw_data")
-
     pictures = visualizer.visualize(raw_data)
 
     return render_template("visualizer.html",

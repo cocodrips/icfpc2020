@@ -2,7 +2,7 @@ import numpy as np
 from dataclasses import dataclass
 
 
-scale_base = 500
+scale_base = 800
 class Picture():
     def __init__(self, image_id, state, index, points):
         self.image_id = image_id
@@ -30,6 +30,8 @@ class Picture():
 
 class Pictures():
     def __init__(self, pictures: [Picture]):
+        if not pictures:
+            pictures = [Picture(-1, -1, -1, np.array([[1, 1]]))]
         self.pictures = pictures
         self._width, self._height = None, None
 
