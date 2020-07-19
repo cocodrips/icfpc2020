@@ -1,3 +1,9 @@
-FROM python
+FROM python:3.7-slim
+
+ENV APP_HOME /judge-dummy
+WORKDIR $APP_HOME
 COPY judge-dummy /judge-dummy
-WORKDIR judge-dummy
+
+RUN pip install Flask gunicorn
+
+CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 app:app
