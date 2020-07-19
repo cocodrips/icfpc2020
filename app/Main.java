@@ -43,6 +43,9 @@ class Main {
         return new Pair(Number.of(car), cdr);
     }
 
+    private static Expr car(Expr expr) { return ((Pair) expr).car; }
+    private static Expr cdr(Expr expr) { return ((Pair) expr).cdr; }
+
     private static Expr NIL = Nil.EXPR;
 
     public static void main(String[] args) throws Exception {
@@ -61,15 +64,15 @@ class Main {
             galaxy = GalaxyLoader.load().get("galaxy");
         }
 
-        Expr req0 = cons(2, cons(playerKey, cons(NIL, NIL)));
-        Expr res0 = send(URI.create(apiUrl), req0);
+        Expr req2 = cons(2, cons(playerKey, cons(NIL, NIL)));
+        Expr res2 = send(URI.create(apiUrl), req2);
 
-        System.out.println(PrettyPrinter.toPrettyString(res0));
+        System.out.println(PrettyPrinter.toPrettyString(res2));
 
         Expr data = cons(442, cons(1, cons(0, cons(1, NIL))));
-        Expr req1 = cons(3, cons(playerKey, cons(data, NIL)));
-        Expr res1 = send(URI.create(apiUrl), req1);
+        Expr req3 = cons(3, cons(playerKey, cons(data, NIL)));
+        Expr res3 = send(URI.create(apiUrl), req3);
 
-        System.out.println(PrettyPrinter.toPrettyString(res1));
+        System.out.println(PrettyPrinter.toPrettyString(res3));
     }
 }
