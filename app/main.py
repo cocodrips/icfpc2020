@@ -48,7 +48,7 @@ class EventLogger:
             "event_logs": self.event_log,
             }, indent=2))
     
-def gen_nil(self):
+def gen_nil():
     return "00"
 
 def gen_number(number):
@@ -71,16 +71,14 @@ def main():
     server_url = sys.argv[1]
     player_key = sys.argv[2]
 
-    print(gen_number(player_key))
-
     log={}
     ev = EventLogger(server_url=server_url, player_key=player_key)
 
-    mod_join = "110110001011"+ gen_number(player_key) + "11000000"
+    mod_join = "110110001011"+ gen_number(int(player_key)) + "11000000"
     res_join, code = send_query(server_url, mod_join, False)
     ev.event_logging("join", mod_join, res_join, code)
     
-    mod_start = "110110001111" + gen_number(player_key) + "11110101101011010110100000"
+    mod_start = "110110001111" + gen_number(int(player_key)) + "11110101101011010110100000"
     res_start, code = send_query(server_url, mod_join, False)
     ev.event_logging("start", mod_start, res_start, code)
 
