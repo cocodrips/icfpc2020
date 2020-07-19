@@ -1,3 +1,3 @@
 #!/bin/sh
 
-python app/main.py "$@" || echo "run error code: $?"
+java -jar /solution/app/build/Main.jar "$@" || echo "run error code: $?"

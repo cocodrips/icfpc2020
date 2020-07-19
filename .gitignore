@@ -4,3 +4,4 @@ Dockerfile
 !*/Dockerfile
 bin/
 _build/
+*.class
