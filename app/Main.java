@@ -36,6 +36,15 @@ class Main {
         return Demodulator.demodulate(response.body().toString());
     }
 
+    private static Expr cons(Expr car, Expr cdr) {
+        return new Pair(car, cdr);
+    }
+    private static Expr cons(long car, Expr cdr) {
+        return new Pair(Number.of(car), cdr);
+    }
+
+    private static Expr NIL = Nil.EXPR;
+
     public static void main(String[] args) throws Exception {
         String apiUrl = args[0] + "/aliens/send";
         long playerKey = Long.parseLong(args[1]);
@@ -52,10 +61,14 @@ class Main {
             galaxy = GalaxyLoader.load().get("galaxy");
         }
 
-        Expr req0 = new Pair(
-            Number.of(2), new Pair(Number.of(playerKey), Nil.EXPR));
+        Expr req0 = cons(2, cons(playerKey, Nil.EXPR));
         Expr res0 = send(URI.create(apiUrl), req0);
 
         System.out.println(PrettyPrinter.toPrettyString(res0));
+
+        Expr req1 = cons(3, cons(cons(442, cons(1, cons(0, cons(1, NIL)))), NIL));
+        Expr res1 = send(URI.create(apiUrl), req1);
+
+        System.out.println(PrettyPrinter.toPrettyString(res1));
     }
 }
