@@ -48,7 +48,7 @@ public class Click {
     }
 
     public static void main(String[] args) throws Exception {
-        Expr galaxy = GalaxyReader.galaxy();
+        Expr galaxy = GalaxyLoader.load().get("galaxy");
 
         Expr state = NIL;
         Expr point = cons(num(0), num(0));
