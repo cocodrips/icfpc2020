@@ -20,8 +20,7 @@ def send_query(url, bit, is_real):
         'accept': '*/*',
         'Content-Type': 'text/plain',
     }
-    #req = urllib.request.Request(url+"/aliens/send", data.encode('utf-8'), headers)
-    req = urllib.request.Request(url, data.encode('utf-8'), headers)
+    req = urllib.request.Request(url+"/aliens/send", data.encode('utf-8'), headers)
     with urllib.request.urlopen(req) as res:
         body = res.read().decode('utf-8')
         code = res.getcode()
