@@ -1,23 +1,27 @@
 package yuizumi;
 
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import yuizumi.eval.*;
 
-public class Main {
-    private static final Pattern USER_FUNC = Pattern.compile(
-        "^(.*?)\\s*=\\s*(.*)$");
+public class GalaxyReader {
+    private static String GALAXY_TXT = "official/galaxy.txt";
 
-    public static void main(String[] args) throws Exception {
-        HashMap<String, Expr> env = new HashMap<>();
+    private static final Pattern USER_FUNC = Pattern.compile("^(.*?)\\s*=\\s*(.*)$");
+
+    public static Map<String, Expr> env() throws IOException {
+        Map<String, Expr> env = new HashMap<>();
         env.putAll(Builtins.MAP);
 
         BufferedReader reader = new BufferedReader(
-            new InputStreamReader(System.in));
+            new FileReader(GALAXY_TXT));
         String line;
         while ((line = reader.readLine()) != null) {
             Matcher matcher = USER_FUNC.matcher(line);
@@ -30,7 +34,8 @@ public class Main {
             }
         }
 
-        Expr result = (new UserFunc("$main", args, env)).reduceToData();
-        System.out.println(PrettyPrinter.toPrettyString(result));
+        return Collections.unmodifiableMap(env);
     }
+
+    public static Expr galaxy() throws IOException { return env().get("galaxy"); }
 }
