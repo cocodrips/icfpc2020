@@ -2,6 +2,10 @@ import requests
 import sys
 import urllib
 import subprocess
+import dataclasses
+from typing import List
+from dataclasses import field
+import json
 
 def send_query(url, bit, is_real):
     #if is_real:
@@ -29,6 +33,30 @@ def modulate(text):
     stdout_value, stderr_value = proc.communicate(text)
     return stdout_value.strip()
 
+@dataclasses.dataclass
+class EventLogger:
+    server_url: str
+    player_key: str
+    event_index: int=0
+    event_log: List[dict] = field(default_factory=list, compare=False)
+
+    def event_logging(self, event_name, query, responce, http_code):
+        self.event_index+=1
+        self.event_log.append( {
+                "event_index": self.event_index,
+                "event_name": event_name,
+                "query": query,
+                "response": responce,
+                "http_code": http_code,
+                })
+    def print_logs(self):
+        print(json.dumps({
+            "server_url": self.server_url,
+            "player_key": self.player_key,
+            "event_logs": self.event_log,
+            }, indent=2))
+    
+
 def main():
     server_url = sys.argv[1]
     player_key = sys.argv[2]
@@ -43,21 +71,21 @@ def main():
     #stdout_data, stderr_data = p.communicate()
     #print("{}".format(stdout_data.decode('utf-8')))
 
-    print('ServerUrl: %s; PlayerKey: %s' % (server_url, player_key))
+    log={}
+    ev = EventLogger(server_url=server_url, player_key=player_key)
+
     mod_join = modulate("2 "+player_key)[:-2]+"110000"
-    print("Join query: {}".format(mod_join))
     res, code = send_query(server_url, mod_join, False)
-    print('Server response: {} code: {}'.format( res, code))
+    ev.event_logging("join", mod_join, res, code)
     
     mod_start = modulate("3 "+player_key+" 0 0 0 0")
-    print("Start query: {}".format(mod_join))
     res, code = send_query(server_url, mod_join, False)
-    print('Server response: {} code: {}'.format( res, code))
+    ev.event_logging("start", mod_start, res, code)
 
-    mod_join = modulate("4 "+player_key)[:-2]+"110000"
-    print("Command query: {}".format(mod_join))
+    mod_command = modulate("4 "+player_key)[:-2]+"110000"
     res, code = send_query(server_url, mod_join, False)
-    print('Server response: {} code: {}'.format( res, code))
+    ev.event_logging("command", mod_command, res, code)
+    ev.print_logs()
 
 if __name__ == '__main__':
     main()
