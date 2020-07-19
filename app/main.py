@@ -24,7 +24,7 @@ def send_query(url, bit, is_real):
     return body.strip(), code
 
 def modulate(text):
-    args = "./portal/bin/modulator"
+    args = "./app/modulator"
     proc = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
     stdout_value, stderr_value = proc.communicate(text)
     return stdout_value.strip()
