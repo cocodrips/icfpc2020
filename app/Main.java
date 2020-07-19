@@ -69,7 +69,7 @@ class Main {
 
         System.out.println(PrettyPrinter.toPrettyString(res2));
 
-        Expr data = cons(446, cons(0, cons(0, cons(1, NIL))));
+        Expr data = cons(100, cons(0, cons(0, cons(1, NIL))));
         Expr req3 = cons(3, cons(playerKey, cons(data, NIL)));
         Expr res3 = send(URI.create(apiUrl), req3);
 
