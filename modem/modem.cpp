@@ -80,7 +80,6 @@ class Modulator : public Modem {
       get_msb(number, msb);
       int cbit = msb % 4;
       cbit = ((msb - msb%4) / 4) + 1;
-      std::cout<<number<<" "<<msb<<" "<<cbit<<std::endl;
       write_cbit_header(cbit);
       for (int i=cbit*4-1;i>=0;i--) {
         if (number & (1LL<<i)) {
