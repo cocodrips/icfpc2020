@@ -107,7 +107,6 @@ ExprPtr CreateExpr(const Token& token) {
         }
         case Tag::kNeg:
         case Tag::kPwr2:
-        case Tag::kIdentity:
         case Tag::kInc:
         case Tag::kDec: {
                 auto param = std::make_shared<FuncParam>(token);
@@ -157,6 +156,9 @@ ExprPtr CreateExpr(const Token& token) {
                 std::make_shared<Func>(token, x1,
                 std::make_shared<Func>(token, x2, ap)));
         }
+        case Tag::kIdentity:
+            auto param = std::make_shared<FuncParam>(token);
+            return std::make_shared<Func>(token, param, param);
     }
     std::clog << "Unsupported token: " << token << " at line " << token.line << std::endl;
     std::abort();
