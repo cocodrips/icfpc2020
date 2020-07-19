@@ -34,7 +34,7 @@ def modulate(text):
     return stdout_value.strip()
 
 def demodulate(text):
-    args = "./app/modem demod".split()
+    args = "./app/modem dem".split()
     proc = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
     stdout_value, stderr_value = proc.communicate(text)
     return stdout_value.strip()
