@@ -20,7 +20,8 @@ def send_query(url, bit, is_real):
         'accept': '*/*',
         'Content-Type': 'text/plain',
     }
-    req = urllib.request.Request(url+"/aliens/send", data.encode('utf-8'), headers)
+    #req = urllib.request.Request(url+"/aliens/send", data.encode('utf-8'), headers)
+    req = urllib.request.Request(url, data.encode('utf-8'), headers)
     with urllib.request.urlopen(req) as res:
         body = res.read().decode('utf-8')
         code = res.getcode()
@@ -28,7 +29,7 @@ def send_query(url, bit, is_real):
     return body.strip(), code
 
 def modulate(text):
-    args = "./app/modulator"
+    args = "./app/modem mod".split()
     proc = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
     stdout_value, stderr_value = proc.communicate(text)
     return stdout_value.strip()
@@ -40,12 +41,13 @@ class EventLogger:
     event_index: int=0
     event_log: List[dict] = field(default_factory=list, compare=False)
 
-    def event_logging(self, event_name, query, responce, http_code):
+    def event_logging(self, event_name, query, mod_query, responce, http_code):
         self.event_index+=1
         self.event_log.append( {
                 "event_index": self.event_index,
                 "event_name": event_name,
                 "query": query,
+                "modulated_query": mod_query,
                 "response": responce,
                 "http_code": http_code,
                 })
@@ -73,18 +75,22 @@ def main():
 
     log={}
     ev = EventLogger(server_url=server_url, player_key=player_key)
-
-    mod_join = modulate("2 "+player_key)[:-2]+"110000"
-    res_join, code = send_query(server_url, mod_join, False)
-    ev.event_logging("join", mod_join, res_join, code)
     
-    mod_start = modulate("3 "+player_key+" 0 0 0 0")
-    res_start, code = send_query(server_url, mod_join, False)
-    ev.event_logging("start", mod_start, res_start, code)
+    query="[2,"+player_key+",nil]"
+    mod_query = modulate(query)
+    res, code = send_query(server_url, mod_query, False)
+    ev.event_logging("join", query, mod_query, res, code)
+    
+    query="[3,"+player_key+",[0,0,0,0]]"
+    mod_query = modulate(query)
+    res, code = send_query(server_url, mod_query, False)
+    ev.event_logging("start", query, mod_query, res, code)
 
-    mod_command = modulate("4 "+player_key)[:-2]+"1111011000001101100000110110000011011000000000"
-    res_command, code = send_query(server_url, mod_join, False)
-    ev.event_logging("command", mod_command, res_command, code)
+    query="[4,"+player_key+",nil]"
+    mod_query = modulate(query)
+    res, code = send_query(server_url, mod_query, False)
+    ev.event_logging("command", query, mod_query, res, code)
+
     ev.print_logs()
 
 if __name__ == '__main__':
