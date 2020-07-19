@@ -74,7 +74,7 @@ def main():
     log={}
     ev = EventLogger(server_url=server_url, player_key=player_key)
 
-    mod_join = "110110001011"+ gen_number(int(player_key)) + "1111000000"
+    mod_join = "110110001011"+ gen_number(int(player_key)) + "00"
     res_join, code = send_query(server_url, mod_join, False)
     ev.event_logging("join", mod_join, res_join, code)
     
