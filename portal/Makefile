@@ -11,14 +11,14 @@ clean:
 setup:
 	mkdir -p _build
 	cp -r ../demodulator _build
-	cp -r ../modulator _build
+	cp -r ../modem _build
 
 local-tool-build: setup
 	mkdir -p bin
 	(cd _build/demodulator && make build)
-	(cd _build/modulator && make build)
+	(cd _build/modem && make build)
 	cp _build/demodulator/bin/demodulator bin
-	cp _build/modulator/bin/modulator bin
+	cp _build/modem/bin/modem bin
 
 
 build: setup
