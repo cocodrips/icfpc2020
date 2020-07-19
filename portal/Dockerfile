@@ -15,7 +15,6 @@ COPY . ./
 
 WORKDIR /work/_build/modem
 RUN make build
-RUN ls bin
 
 # ----------------------------
 FROM python:3.8 as python

@@ -9,9 +9,7 @@ clean:
 	rm -rf bin
 
 setup:
-	mkdir -p _build
-	cp -r ../demodulator _build
-	cp -r ../modem _build
+	cd ../ && ./cloud_build_setup.sh
 
 local-tool-build: setup
 	mkdir -p bin
