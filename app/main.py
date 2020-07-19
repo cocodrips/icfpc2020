@@ -33,6 +33,12 @@ def modulate(text):
     stdout_value, stderr_value = proc.communicate(text)
     return stdout_value.strip()
 
+def demodulate(text):
+    args = "./app/modem demod".split()
+    proc = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
+    stdout_value, stderr_value = proc.communicate(text)
+    return stdout_value.strip()
+
 @dataclasses.dataclass
 class EventLogger:
     server_url: str
@@ -40,7 +46,7 @@ class EventLogger:
     event_index: int=0
     event_log: List[dict] = field(default_factory=list, compare=False)
 
-    def event_logging(self, event_name, query, mod_query, responce, http_code):
+    def event_logging(self, event_name, query, mod_query, responce, http_code, demod_res):
         self.event_index+=1
         self.event_log.append( {
                 "event_index": self.event_index,
@@ -48,6 +54,7 @@ class EventLogger:
                 "query": query,
                 "modulated_query": mod_query,
                 "response": responce,
+                "demodulated_responce": demod_res,
                 "http_code": http_code,
                 })
     def print_logs(self):
@@ -78,17 +85,20 @@ def main():
     query="(2,("+player_key+",(nil,nil)))"
     mod_query = modulate(query)
     res, code = send_query(server_url, mod_query, False)
-    ev.event_logging("join", query, mod_query, res, code)
+    demod_res = demodulate(res)
+    ev.event_logging("join", query, mod_query, res, code, demod_res)
     
-    query="[3,"+player_key+",[442,1,0,1]]"
+    query="[3,"+player_key+",[446,0,0,1]]"
     mod_query = modulate(query)
     res, code = send_query(server_url, mod_query, False)
-    ev.event_logging("start", query, mod_query, res, code)
+    demod_res = demodulate(res)
+    ev.event_logging("start", query, mod_query, res, code, demod_res)
 
     query="[4,"+player_key+",nil]]"
     mod_query = modulate(query)
     res, code = send_query(server_url, mod_query, False)
-    ev.event_logging("command", query, mod_query, res, code)
+    demod_res = demodulate(res)
+    ev.event_logging("command", query, mod_query, res, code, demod_res)
 
     ev.print_logs()
 
