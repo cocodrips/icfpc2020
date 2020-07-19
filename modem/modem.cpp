@@ -3,14 +3,12 @@
 #include <stack>
 #include <cctype>
 #include <cmath>
+#include <sstream>
 
 class Modem {
   public:
     void init() {
-      std::string token;
-      while (std::cin>>token) {
-        input += token;
-      }
+      std::cin>>input;
     }
     void init(std::string in) {
       input = in;
