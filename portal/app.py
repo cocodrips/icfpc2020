@@ -2,6 +2,7 @@ import os
 
 from flask import Flask, request, render_template, Response
 from api import modem, visualizer, interactor
+from api.protocol import galaxy
 from jinja2 import Template, Environment, FileSystemLoader
 import json
 
@@ -25,6 +26,16 @@ def demodulator_web():
                            modulator_output=modulator_output,
                            modulator_func=modulator_func)
 
+@app.route('/galaxy')
+def galaxy_web():
+    gal_state = request.args.get("gal_state")
+    gal_var = request.args.get("gal_var")
+    galaxy_output = interactor.interact("galaxy", gal_state, gal_var, 0, False)
+
+    return render_template("galaxy.html",
+            gal_state=gal_state,
+            gal_var=gal_var,
+            galaxy_output=galaxy_output)
 
 @app.route('/visualizer')
 def visualizer_web():
@@ -82,6 +93,12 @@ def protocol_statelessdraw_api():
         "state": 0,
         "value": value,
     })
+
+@app.route('/protocol/galaxy')
+def protocol_galaxy_api():
+    value = request.args.get("value")
+    return galaxy.convert(value.split("_"))
+
 
 @app.route('/')
 def hello_world():

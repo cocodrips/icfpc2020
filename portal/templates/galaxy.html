@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}
+    galaxy
+{% endblock %}
+
+
+{% block body %}
+
+    <form class="pure-form" action="/galaxy" method="get">
+        <div>
+            <legend class="uk-legend">Galaxy</legend>
+
+            <div uk-grid>
+                <div class="uk-width-4-5">
+                    <div>
+                        <textarea class="uk-textarea uk-width-3-4"
+                                  name="gal_state"
+                                  cols=50 placeholder="state"
+                                  rows="3"
+                                  style="width: 100%">{% if gal_state %}{{ gal_state }}{% endif %}</textarea>
+                    </div>
+                    <div>
+                        <textarea class="uk-textarea uk-width-3-4"
+                                  name="gal_var"
+                                  cols=50 placeholder="value"
+                                  rows="3"
+                                  style="width: 100%">{% if gal_var %}{{ gal_var }}{% endif %}</textarea>
+                    </div>
+
+                    <div class="uk-margin-top">
+
+                        <textarea class="uk-textarea" name="galaxy-output"
+                                  id=""
+                                  cols="100" placeholder="result"
+                                  rows="3">{{ galaxy_output }}</textarea>
+                    </div>
+                </div>
+                <div class="uk-width-1-5">
+                    <button type="submit"
+                            class="uk-button uk-button-default uk-button-large">
+                        convert
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+
+{% endblock %}
+
+
+
