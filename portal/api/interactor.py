@@ -44,7 +44,7 @@ def call_protocol(protocol, state, value):
     if state == "nil":
         state_a = state
     else:
-        parsed = eval(state)
+        parsed = eval(state.replace('nil', '[]'))
         state_a = apapnize(parsed)
     p_value = eval(value)
     value_a = apapnize(p_value)
