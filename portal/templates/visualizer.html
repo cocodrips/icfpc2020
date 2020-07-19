@@ -9,10 +9,9 @@
             var rect = e.target.getBoundingClientRect();
             x = e.clientX - rect.left;
             y = e.clientY - rect.top;
-            var x_ = parseInt(x / {{ pictures.scale }} + {{ pictures.xmin}});
-            var y_ = parseInt(y / {{ pictures.scale }} + {{ pictures.ymin }});
+            var x_ = parseInt(x / {{ pictures.scale }}) + {{ pictures.xmin}};
+            var y_ = parseInt(y / {{ pictures.scale }}) + {{ pictures.ymin }};
             document.getElementById("point").innerHTML = `(${x_}, ${y_})`;
-
         }
     </script>
 
@@ -34,6 +33,8 @@
 
     <div class="uk-grid uk-margin uk-flex-center">
         {% for image_id in pictures.image_ids %}
+            {% if image_id >= 0 %}
+
             <div>
                 <p class="uk-margin-small">
                     {{ image_id }}
@@ -73,6 +74,8 @@
                 </script>
 
             </div>
+            {% endif %}
+
         {% endfor %}
     </div>
 

@@ -30,6 +30,8 @@ class Picture():
 
 class Pictures():
     def __init__(self, pictures: [Picture]):
+        if not pictures:
+            pictures = [Picture(-1, -1, -1, np.array([[1, 1]]))]
         self.pictures = pictures
         self._width, self._height = None, None
 
