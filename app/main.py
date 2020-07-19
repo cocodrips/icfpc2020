@@ -78,7 +78,7 @@ def main():
     res_join, code = send_query(server_url, mod_join, False)
     ev.event_logging("join", mod_join, res_join, code)
     
-    mod_start = modulate("3 "+player_key+" 0 0 0 0")
+    mod_start = "110110001111" + modulate(player_key)[2:-2] + "11110101101011010110100000"
     res_start, code = send_query(server_url, mod_join, False)
     ev.event_logging("start", mod_start, res_start, code)
 
