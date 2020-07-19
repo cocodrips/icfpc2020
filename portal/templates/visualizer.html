@@ -9,7 +9,7 @@
     <form action="/visualizer" type="get">
         <div uk-grid>
         <div class="uk-width-3-4">
-            <textarea name="raw_data" placeholder="[flag, state, data]"
+            <textarea name="raw_data" placeholder="[flag, state, data]..."
                       class="uk-textarea uk-width-4-5" cols="100" rows="3"
                       style="width: 100%">{% if raw_data %}{{ raw_data }}{% endif %}</textarea>
         </div>
@@ -20,9 +20,6 @@
     </form>
 
     <div class="uk-grid uk-margin">
-        <script>
-            console.log("{{ pictures.width }},{{ pictures.height }}, {{ pictures.scale }}")
-        </script>
         {% for image_id in pictures.image_ids %}
         <div>
             <p class="uk-margin-small">
