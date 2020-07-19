@@ -8,14 +8,7 @@ from dataclasses import field
 import json
 
 def send_query(url, bit, is_real):
-    #if is_real:
-    #    url = 'https://icfpc2020-api.testkontur.ru/aliens/send'
-    #else:
-    #    url = 'https://dummy-server-prtffs3u5a-uc.a.run.app/aliens/send'
     data = bit
-    #params = {
-    #'apiKey': "95052afa4bf54914a26622eea251b536",
-    #}
     headers = {
         'accept': '*/*',
         'Content-Type': 'text/plain',
@@ -24,7 +17,6 @@ def send_query(url, bit, is_real):
     with urllib.request.urlopen(req) as res:
         body = res.read().decode('utf-8')
         code = res.getcode()
-        #info = res.info()
     return body.strip(), code
 
 def modulate(text):
@@ -56,29 +48,39 @@ class EventLogger:
             "event_logs": self.event_log,
             }, indent=2))
     
+def gen_nil(self):
+    return "00"
+
+def gen_number(number):
+    if number == 0:
+        return "010";
+    ret = ""
+    if number < 0:
+        ret += "10"
+    else:
+        ret += "01"
+    ret += "11111111111111110"
+    for i in range(64):
+        if number & (1<<(63-i)) > 0:
+            ret+="1"
+        else:
+            ret+="0"
+    return ret
 
 def main():
     server_url = sys.argv[1]
     player_key = sys.argv[2]
 
-    #Environment Investigation
-    #print("$free -mh")
-    #p = subprocess.Popen("free -mh", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    #stdout_data, stderr_data = p.communicate()
-    #print("{}".format(stdout_data.decode('utf-8')))
-    #print("$cat /proc/cpuinfo")
-    #p = subprocess.Popen("cat /proc/cpuinfo", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    #stdout_data, stderr_data = p.communicate()
-    #print("{}".format(stdout_data.decode('utf-8')))
+    print(gen_number(player_key))
 
     log={}
     ev = EventLogger(server_url=server_url, player_key=player_key)
 
-    mod_join = modulate("2 "+player_key)[:-2]+"00"
+    mod_join = "110110001011"+ gen_number(player_key) + "11000000"
     res_join, code = send_query(server_url, mod_join, False)
     ev.event_logging("join", mod_join, res_join, code)
     
-    mod_start = "110110001111" + modulate(player_key)[2:-2] + "11110101101011010110100000"
+    mod_start = "110110001111" + gen_number(player_key) + "11110101101011010110100000"
     res_start, code = send_query(server_url, mod_join, False)
     ev.event_logging("start", mod_start, res_start, code)
 
