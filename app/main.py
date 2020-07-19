@@ -75,16 +75,16 @@ def main():
     ev = EventLogger(server_url=server_url, player_key=player_key)
 
     mod_join = modulate("2 "+player_key)[:-2]+"110000"
-    res, code = send_query(server_url, mod_join, False)
-    ev.event_logging("join", mod_join, res, code)
+    res_join, code = send_query(server_url, mod_join, False)
+    ev.event_logging("join", mod_join, res_join, code)
     
     mod_start = modulate("3 "+player_key+" 0 0 0 0")
-    res, code = send_query(server_url, mod_join, False)
-    ev.event_logging("start", mod_start, res, code)
+    res_start, code = send_query(server_url, mod_join, False)
+    ev.event_logging("start", mod_start, res_start, code)
 
     mod_command = modulate("4 "+player_key)[:-2]+"110000"
-    res, code = send_query(server_url, mod_join, False)
-    ev.event_logging("command", mod_command, res, code)
+    res_command, code = send_query(server_url, mod_join, False)
+    ev.event_logging("command", mod_command, res_command, code)
     ev.print_logs()
 
 if __name__ == '__main__':
