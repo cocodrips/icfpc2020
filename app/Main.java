@@ -61,7 +61,7 @@ class Main {
             galaxy = GalaxyLoader.load().get("galaxy");
         }
 
-        Expr req0 = cons(2, cons(playerKey, Nil.EXPR));
+        Expr req0 = cons(2, cons(playerKey, cons(NIL, NIL)));
         Expr res0 = send(URI.create(apiUrl), req0);
 
         System.out.println(PrettyPrinter.toPrettyString(res0));
