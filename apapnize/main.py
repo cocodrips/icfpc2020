@@ -19,6 +19,6 @@ def apapnize(e):
 
 
 line = sys.stdin.readline()
-parsed = eval(line)
+parsed = eval(line.replace('nil', '[]'))
 print(apapnize(parsed))
 
