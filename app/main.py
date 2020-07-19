@@ -75,13 +75,7 @@ def main():
     log={}
     ev = EventLogger(server_url=server_url, player_key=player_key)
     
-    query="1101000"
-    mod_query = "1101000"
-    res, code = send_query(server_url, mod_query, False)
-    ev.event_logging("get time?", query, mod_query, res, code)
-    
-
-    query="[2,"+player_key+",nil]"
+    query="(2,("+player_key+",(nil,nil)))"
     mod_query = modulate(query)
     res, code = send_query(server_url, mod_query, False)
     ev.event_logging("join", query, mod_query, res, code)
