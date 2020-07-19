@@ -1,6 +1,7 @@
 import java.net.*;
 import java.net.http.*;
 import yuizumi.eval.*;
+import yuizumi.GalaxyReader;
 
 class Main {
     public static Expr sendQuery(String serverUrl, Expr requestExpr) {
@@ -36,6 +37,11 @@ class Main {
     public static void main(String[] args) throws Exception {
         String serverUrl = args[0];
         long playerKey = Long.parseLong(args[1]);
+        boolean isLocalRun = args.length > 2 && args[2] == "local";
+        if (!isLocalRun) {
+            GalaxyReader.setGalaxyPath("/solution/app/build/galaxy.txt");
+        }
+        Expr galaxy = GalaxyReader.galaxy();
         Expr req0 = new Pair(
             yuizumi.eval.Number.of(2),
             new Pair(yuizumi.eval.Number.of(playerKey),

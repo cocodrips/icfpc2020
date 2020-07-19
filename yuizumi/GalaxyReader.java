@@ -16,6 +16,10 @@ public class GalaxyReader {
 
     private static final Pattern USER_FUNC = Pattern.compile("^(.*?)\\s*=\\s*(.*)$");
 
+    public static void setGalaxyPath(String path) {
+        GALAXY_TXT = path;
+    }
+
     public static Map<String, Expr> env() throws IOException {
         Map<String, Expr> env = new HashMap<>();
         env.putAll(Builtins.MAP);
