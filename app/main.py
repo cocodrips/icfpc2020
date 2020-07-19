@@ -78,7 +78,7 @@ def main():
     res_join, code = send_query(server_url, mod_join, False)
     ev.event_logging("join", mod_join, res_join, code)
     
-    mod_start = "110110001111" + gen_number(int(player_key)) + "11110101101011010110100000"
+    mod_start = "110110001111" + gen_number(int(player_key)) + "1111011000001101100000110110000011011000000000"
     res_start, code = send_query(server_url, mod_join, False)
     ev.event_logging("start", mod_start, res_start, code)
 
