@@ -29,22 +29,27 @@
                 height="{{ pictures.height * pictures.scale }}"></canvas>
         <script>
             console.log("{{ pictures.ymin }}~{{ pictures.ymax }}, {{ pictures.xmin }}~{{ pictures.xmax }}")
-            let canvas_all = document.getElementById("canvas-{{ picture.index }}");
-            let context_all = canvas.getContext("2d");
-            context_all.scale({{ pictures.scale }}, {{ pictures.scale }});
+            var canvas = document.getElementById("canvas-all");
+            var context = canvas.getContext("2d");
+            context.scale({{ pictures.scale }}, {{ pictures.scale }});
 
-            context_all.fillStyle = "black";
-            context_all.fillRect(0, 0, canvas.width, canvas.height);
+            context.fillStyle = "black";
+            context.fillRect(0, 0, canvas.width, canvas.height);
 
-            context_all.fillStyle = "#666";
-            context_all.fillRect({{ -pictures.xmin }}, {{ -pictures.ymin }}, 1, 1);
-            
-            context_all.fillStyle = "#20cfcd";
-            context_all.globalAlpha = 0.2;
+            context.fillStyle = "#666";
+            context.fillRect({{ -pictures.xmin }}, {{ -pictures.ymin }}, 1, 1);
 
+            context.fillStyle = "#20cfcd";
+            context.globalAlpha = 0.2;
 
+            {% for picture in pictures.pictures %}
+                {% for point in picture.points %}
+                    context.fillRect({{ point[0] - pictures.xmin }}, {{ point[1] - pictures.ymin }}, 1, 1);
+                {% endfor %}
+            {% endfor %}
         </script>
 
+    </div>
     </div>
     <div class="uk-grid uk-margin">
 
@@ -76,12 +81,6 @@
                 {% for point in picture.points %}
                     context.fillRect({{ point[0] - pictures.xmin }}, {{ point[1] - pictures.ymin }}, 1, 1);
                 {% endfor %}
-
-                {% for point in picture.points %}
-                    context_all.fillRect({{ point[0] - pictures.xmin }}, {{ point[1] - pictures.ymin }}, 1, 1);
-                {% endfor %}
-
-
                 context.fillStyle = "#666";
                 context.fillRect({{ -pictures.xmin }}, {{ -pictures.ymin }}, 1, 1);
 
