@@ -122,16 +122,8 @@ class Main {
             long posY = cdr(position).asNumber().value;
             long velX = car(velocity).asNumber().value;
             long velY = cdr(velocity).asNumber().value;
-            long accX = Math.abs(posX) > 70
-                ? sign(posX)
-                : (Math.abs(posX) > 50
-                    ? 0
-                    : (Math.abs(velX) < 8 ? sign(posY) : 0));
-            long accY = Math.abs(posX) > 70
-                ? sign(posY)
-                : (Math.abs(posY) > 50
-                    ? 0
-                    : (Math.abs(velY) < 8 ? -sign(posX) : 0));
+            long accX = decideAcc(posX, velX, sign(posX), sign(posY));
+            long accY = decideAcc(posY, velY, sign(posY), -sign(posX));
             Expr acc = cons(accX, accY);
             Expr command = cons(0, cons(shipId, cons(acc, NIL)));
 
@@ -155,7 +147,27 @@ class Main {
             System.out.println(PrettyPrinter.toPrettyString(gameRes));
         }
     }
-    static long sign(long num) {
+
+    private static long decideAcc(long pos, long vel, long to_center, long rotate) {
+        if (Math.abs(pos) > 70) {
+            return to_center;
+        }
+        if (Math.abs(pos) < 20) {
+            return -to_center;
+        }
+        if (Math.abs(pos) > 50) {
+            return 0;
+        }
+        if (Math.abs(vel) >= 10) {
+            return sign(vel);
+        }
+        if (Math.abs(vel) >= 8) {
+            return 0;
+        }
+        return rotate;
+    }
+
+    private static long sign(long num) {
         return num < 0 ? -1 : (num > 0 ? 1 : 0);
     }
 }
