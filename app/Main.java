@@ -35,7 +35,7 @@ class Main {
 
     public static void main(String[] args) throws Exception {
         String serverUrl = args[0];
-        int playerKey = Integer.parseInt(args[1]);
+        long playerKey = Long.parseLong(args[1]);
         Expr req0 = new Pair(
             yuizumi.eval.Number.of(2),
             new Pair(yuizumi.eval.Number.of(playerKey),
