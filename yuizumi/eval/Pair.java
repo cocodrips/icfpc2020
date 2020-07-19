@@ -21,6 +21,10 @@ public class Pair extends ReducibleExpr {
         return new Apply(new Apply(x, car), cdr);
     }
 
+    @Override public Number asNumber() {
+        throw new IllegalStateException(String.format("%s is not a number", this));
+    }
+
     @Override public String toString() {
         return String.format("Pair(%s, %s)", car, cdr);
     }
