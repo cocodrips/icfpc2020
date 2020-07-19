@@ -7,51 +7,74 @@
 {% block body %}
 
     <form class="pure-form" action="/modem" method="get">
-    <div>
-        <legend class="uk-legend">Demodulator</legend>
+        <div>
+            <legend class="uk-legend">Demodulator</legend>
 
-        <p>
-            <textarea class="uk-textarea uk-width-3-4" name="demodulator-binary" id="" cols="100" placeholder="binary"
-                      rows="3">{% if demodulator_binary %}{{ demodulator_binary }}{% endif %}</textarea>
+            <div uk-grid>
+                <div class="uk-width-4-5">
+                    <div>
+                        <textarea class="uk-textarea uk-width-3-4"
+                                  name="demodulator-binary"
+                                  cols=100 placeholder="binary"
+                                  rows="3"
+                                  style="width: 100%">{% if demodulator_binary %}{{ demodulator_binary }}{% endif %}</textarea>
+                    </div>
+                    <div class="uk-margin-top">
 
-            <button type="submit"
-                    class="uk-button uk-button-default uk-button-large">
-                demodulate
-            </button>
-        </p>
+                        <textarea class="uk-textarea" name="demodulator-output"
+                                  id=""
+                                  cols="100" placeholder="result"
+                                  rows="3">{{ demodulator_output }}</textarea>
+                    </div>
+                </div>
+                <div class="uk-width-1-5">
+                    <button type="submit"
+                            class="uk-button uk-button-default uk-button-large">
+                        demodulate
+                    </button>
+                </div>
 
+            </div>
 
-        <p>
-            <textarea class="uk-textarea" name="demodulator-output" id=""
-                      cols="100" placeholder="result"
-                      rows="3">{{ demodulator_output }}</textarea>
-        </p>
+            <hr class="uk-margin-middle">
+            <legend class="uk-legend uk-margin-top">Modulator</legend>
+            <div uk-grid>
+                <div class="uk-width-4-5">
 
-        <legend class="uk-legend">Modulator</legend>
-        <p>
-            <textarea class="uk-textarea uk-width-3-4" name="modulator-list"
-                      id="" cols="100" rows=1 placeholder="list Example:1 2">{% if modulator_list %}{{ modulator_list }}{% endif %}</textarea>
+                    <div>
+                        <textarea class="uk-textarea uk-width-4-5"
+                                  name="modulator-list"
+                                  style="width: 100%"
+                                  id="" cols="100" rows=1
+                                  placeholder="list Example:1 2">{% if modulator_list %}{{ modulator_list }}{% endif %}</textarea>
+                    </div>
 
-            <button type="submit"
-                    class="uk-button uk-button-default uk-button-large">
-                modulate
-            </button>
-        </p>
+                    <div class="uk-margin-top">
 
+                        <textarea class="uk-textarea" name="modulator-output"
+                                  id=""
+                                  cols="100"
+                                  rows="2">{{ modulator_output }}</textarea>
+                    </div>
+                    <div class="uk-margin-top">
 
-        <p>
-            <textarea class="uk-textarea" name="modulator-output" id=""
-                      cols="100"
-                      rows="2">{{ modulator_output }}</textarea>
-        </p>
+                        <textarea class="uk-textarea" name="modulator-func"
+                                  id=""
+                                  cols="100"
+                                  rows="2">{{ modulator_func }}</textarea>
+                    </div>
+                </div>
 
-        <p>
-            <textarea class="uk-textarea" name="modulator-func" id=""
-                      cols="100"
-                      rows="2">{{ modulator_func }}</textarea>
-        </p>
+                <div class="uk-width-1-5">
 
-    </div>
+                    <button type="submit"
+                            class="uk-button uk-button-default uk-button-large">modulate</button>
+
+                </div>
+            </div>
+            <hr class="uk-margin-middle">
+        </div>
+
     </form>
 
 {% endblock %}

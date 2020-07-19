@@ -4,9 +4,11 @@
 {% endblock %}
 
 {% block body %}
-<div class="markdown-body"></div>
-<script>
-    axios.get('../README.md')
-        .then(response => document.querySelector('.markdown-body').innerHTML = marked(response.data));
-</script>
+
+    <div class="markdown-body"></div>
+
+    <script>
+        axios.get('../README.md')
+            .then(response => document.querySelector('.markdown-body').innerHTML = marked(response.data));
+    </script>
 {% endblock %}

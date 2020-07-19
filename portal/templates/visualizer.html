@@ -3,53 +3,57 @@
 
 
 {% block body %}
-    <form action="/visualizer" type="get">
-        <p>
 
-        <div uk-form-custom="target: true"
-             class="uk-form-custom uk-first-column">
-            <input type="text" name="raw_data" placeholder="[flag, state, data]"
-                   class="uk-input uk-form-width-large"
-                   value="{% if raw_data %}{{ raw_data }}{% endif %}">
+
+
+    <form action="/visualizer" type="get">
+        <div uk-grid>
+        <div class="uk-width-3-4">
+            <textarea name="raw_data" placeholder="[flag, state, data]"
+                      class="uk-textarea uk-width-4-5" cols="100" rows="3"
+                      style="width: 100%">{% if raw_data %}{{ raw_data }}{% endif %}</textarea>
         </div>
-        <button class="uk-button uk-button-default">visualize</button>
-        </p>
+        <div class="uk-width-1-4">
+            <button class="uk-button uk-button-default" type="submit">visualize</button>
+        </div>
+        </div>
     </form>
 
+    <div class="uk-grid uk-margin">
+        {% for picture in pictures.pictures %}
 
-    {% for picture in pictures.pictures %}
-        <div class="uk-grid uk-margin">
-            <div>
-                {{ picture.index }}
-            </div>
-            <div>
+            <div class="uk-width-1-3">
+                <p class="uk-margin-small">
+                    {{ picture.index }}
+                </p>
                 <canvas id="canvas-{{ picture.index }}"
                         width="{{ pictures.width * pictures.scale }}"
                         height="{{ pictures.height * pictures.scale }}"></canvas>
             </div>
-            <div></div>
 
-        </div>
-        <script>
-            console.log("{{ pictures.ymin }}~{{ pictures.ymax }}, {{ pictures.xmin }}~{{ pictures.xmax }}")
-            var canvas = document.getElementById("canvas-{{ picture.index }}");
-            var context = canvas.getContext("2d");
-            context.scale({{ pictures.scale }}, {{ pictures.scale }});
 
-            context.fillStyle = "black";
-            context.fillRect(0, 0, canvas.width, canvas.height);
 
-            context.fillStyle = "#20cfcd";
+            <script>
+                console.log("{{ pictures.ymin }}~{{ pictures.ymax }}, {{ pictures.xmin }}~{{ pictures.xmax }}")
+                var canvas = document.getElementById("canvas-{{ picture.index }}");
+                var context = canvas.getContext("2d");
+                context.scale({{ pictures.scale }}, {{ pictures.scale }});
 
-            {% for point in picture.points %}
-                context.fillRect({{ point[0] - pictures.xmin }}, {{ point[1] - pictures.ymin }}, 1, 1);
-            {% endfor %}
+                context.fillStyle = "black";
+                context.fillRect(0, 0, canvas.width, canvas.height);
 
-            context.fillStyle = "#666";
-            context.fillRect({{ -pictures.xmin }}, {{ -pictures.ymin }}, 1, 1);
+                context.fillStyle = "#20cfcd";
 
-        </script>
-    {% endfor %}
+                {% for point in picture.points %}
+                    context.fillRect({{ point[0] - pictures.xmin }}, {{ point[1] - pictures.ymin }}, 1, 1);
+                {% endfor %}
+
+                context.fillStyle = "#666";
+                context.fillRect({{ -pictures.xmin }}, {{ -pictures.ymin }}, 1, 1);
+
+            </script>
+        {% endfor %}
+    </div>
 
 {% endblock %}
 
