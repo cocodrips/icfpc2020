@@ -94,7 +94,7 @@ def main():
     demod_res = demodulate(res)
     ev.event_logging("start", query, mod_query, res, code, demod_res)
 
-    query="[4,"+player_key+",nil]]"
+    query="[4,"+player_key+",[0,1,[10,10]]]]"
     mod_query = modulate(query)
     res, code = send_query(server_url, mod_query, False)
     demod_res = demodulate(res)
