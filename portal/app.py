@@ -1,10 +1,9 @@
-import os
+import json
 
 from flask import Flask, request, render_template, Response
 from api import modem, visualizer, interactor
 from api.protocol import galaxy
 from jinja2 import Template, Environment, FileSystemLoader
-import json
 
 app = Flask(__name__)
 
@@ -18,7 +17,6 @@ def demodulator_web():
     modulator_list = request.form.get("modulator-list")
     modulator_output = modem.modulate(modulator_list)
     modulator_func = modem.demodulate(modulator_output)
-    print(modulator_output)
     return render_template("modem.html",
                            demodulator_binary=demodulator_binary,
                            demodulator_output=demodulator_output,

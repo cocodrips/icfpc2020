@@ -27,6 +27,10 @@ def modulate(e):
     raise ValueError('input contains unknown expression')
 
 
+def modulate_from_string(string):
+  parsed = eval(string)
+  return modulate(parsed)
+
 def main():
   line = sys.stdin.readline()
 
