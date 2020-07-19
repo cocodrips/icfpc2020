@@ -30,6 +30,7 @@ class Pictures():
         self.pictures = pictures
         self._width, self._height = None, None
 
+
     @property
     def xmin(self):
         return min([p.xmin for p in self.pictures])
