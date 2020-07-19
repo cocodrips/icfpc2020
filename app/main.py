@@ -82,7 +82,7 @@ def main():
     res_start, code = send_query(server_url, mod_join, False)
     ev.event_logging("start", mod_start, res_start, code)
 
-    mod_command = modulate("4 "+player_key)[:-2]+"110000"
+    mod_command = modulate("4 "+player_key)[:-2]+"1111011000001101100000110110000011011000000000"
     res_command, code = send_query(server_url, mod_join, False)
     ev.event_logging("command", mod_command, res_command, code)
     ev.print_logs()
