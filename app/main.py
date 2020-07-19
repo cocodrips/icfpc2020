@@ -93,7 +93,7 @@ def main():
     #else:
     #    cood="[0,0,0,0]"
     
-    query="[3,"+player_key+","+cood+"]"
+    query="[3,"+player_key+",446,0,0,1]"
     mod_query = modulate(query)
     res, code = send_query(server_url, mod_query, False)
     demod_res = demodulate(res)
