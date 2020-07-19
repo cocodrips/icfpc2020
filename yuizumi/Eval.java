@@ -6,7 +6,7 @@ import yuizumi.eval.*;
 
 public class Eval {
     public static void main(String[] args) throws Exception {
-        Map<String, Expr> env = GalaxyReader.env();
+        Map<String, Expr> env = GalaxyLoader.load();
         Expr result = (new UserFunc("$main", args, env)).reduceToData();
         System.out.println(PrettyPrinter.toPrettyString(result));
     }
