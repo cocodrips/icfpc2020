@@ -1,6 +1,7 @@
 #!/bin/sh
 
 javac -d app/build yuizumi/eval/*.java
+javac -d app/build yuizumi/GalaxyReader.java
 javac -d app/build app/*.java
 
 cd app/build
