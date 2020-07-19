@@ -2,7 +2,7 @@ import numpy as np
 from dataclasses import dataclass
 
 
-scale_base = 500
+scale_base = 800
 class Picture():
     def __init__(self, image_id, state, index, points):
         self.image_id = image_id
