@@ -166,6 +166,8 @@ class Main {
                     acc = Vector.of(sign(pos.x - sign(pos.x) * 14), -gravityY);
                     ++motionState;
                 }
+            } else if (motionState >= 0) {
+                // do nothing
             } else if (gravityX != 0 && gravityY != 0) {
                 acc = Vector.of(gravityY, -gravityX);
             } else if ((vel.l2Norm() < 8 && pos.l2Norm() <= 80) || pos.l2Norm() <= 35) {
