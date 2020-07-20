@@ -4,6 +4,8 @@ import java.io.*;
 import java.net.*;
 import java.net.http.*;
 import java.util.Random;
+import java.util.Vector;
+
 import yuizumi.GalaxyLoader;
 import yuizumi.eval.*;
 import yuizumi.eval.Number;
@@ -61,16 +63,33 @@ class Main {
 
     private static Expr NIL = Nil.EXPR;
 
+    public static class Vector {
+        private Vector(long x, long y) {
+            this.x = x;
+            this.y = y;
+        }
+        public static Vector of(long x, long y) {
+            return new Vector(x, y);
+        }
+        public Vector orthogonal() {
+            return Vector.of(y, -x);
+        }
+        public Expr toExpr() {
+            return cons(x, y);
+        }
+        public boolean isZero() {
+            return x == 0 && y == 0;
+        }
+        public long x;
+        public long y;
+    }
+
     public static void main(String[] args) throws Exception {
         String apiUrl = args[0] + "/aliens/send";
         long playerKey = Long.parseLong(args[1]);
-
-        Expr galaxy;
-
         if (DOCKER_GALAXY_TXT.exists()) {
             System.out.println("Running on Docker.");
             String path = DOCKER_GALAXY_TXT.getPath();
-            galaxy = GalaxyLoader.load(path).get("galaxy");
             if (apiUrl.startsWith("https://icfpc2020-api.testkontur.ru")) {
                 System.out.println("But on test server.");
                 apiUrl += "?apiKey=" + API_KEY;
@@ -78,7 +97,6 @@ class Main {
         } else {
             System.out.println("Running locally.");
             apiUrl += "?apiKey=" + API_KEY;
-            galaxy = GalaxyLoader.load().get("galaxy");
         }
 
         Expr req2 = cons(2, cons(playerKey, cons(NIL, NIL)));
@@ -86,13 +104,13 @@ class Main {
 
         System.out.println(PrettyPrinter.toPrettyString(res2));
 
-        Expr data = cons(64, cons(64, cons(10, cons(1, NIL))));
+        Expr data = cons(200, cons(30, cons(30, cons(1, NIL))));
         Expr req3 = cons(3, cons(playerKey, cons(data, NIL)));
         Expr gameRes = send(URI.create(apiUrl), req3);
+        System.out.println(PrettyPrinter.toPrettyString(gameRes));
         Expr staticGameInfo = idx(gameRes, 2);
         long role = idx(staticGameInfo, 1).asNumber().value;
 
-        System.out.println(PrettyPrinter.toPrettyString(gameRes));
         Random random = new Random();
         while (true) {
             long stage = idx(gameRes, 1).asNumber().value;
@@ -106,6 +124,8 @@ class Main {
                 Expr ship = car(shipAndComand);
                 if (idx(ship, 0).asNumber().value == role) {
                     myShip = ship;
+                    System.out.println(
+                        "executed:" + PrettyPrinter.toPrettyString(idx(shipAndComand, 1)));
                 } else {
                     otherShip = ship;
                 }
@@ -114,29 +134,52 @@ class Main {
             if (myShip == null) {
                 break;
             }
+
+            // Generate commands.
+            Expr commands = NIL;
+
             // Rotate.
             long shipId = idx(myShip, 1).asNumber().value;
-            Expr position = idx(myShip, 2); // vector
-            Expr velocity = idx(myShip, 3); // vector
-            long posX = car(position).asNumber().value;
-            long posY = cdr(position).asNumber().value;
-            long velX = car(velocity).asNumber().value;
-            long velY = cdr(velocity).asNumber().value;
-            long accX = Math.abs(posX) > 70
-                ? sign(posX)
-                : (Math.abs(posX) > 50
-                    ? 0
-                    : (Math.abs(velX) < 8 ? sign(posY) : 0));
-            long accY = Math.abs(posX) > 70
-                ? sign(posY)
-                : (Math.abs(posY) > 50
-                    ? 0
-                    : (Math.abs(velY) < 8 ? -sign(posX) : 0));
-            Expr acc = cons(accX, accY);
-            Expr command = cons(0, cons(shipId, cons(acc, NIL)));
+            Expr pos = idx(myShip, 2); // vector
+            System.out.println("pos: " + PrettyPrinter.toPrettyString(pos));
+            long posX = car(pos).asNumber().value;
+            long posY = cdr(pos).asNumber().value;
+            long posNorm = (long) Math.sqrt(posX * posX + posY * posY);
+            Expr vel = idx(myShip, 3); // vector
+            System.out.println("vel: " + PrettyPrinter.toPrettyString(vel));
+            long velX = car(vel).asNumber().value;
+            long velY = cdr(vel).asNumber().value;
+            long velNorm = (long) Math.sqrt(velX * velX + velY * velY);
+            long gravityX = Math.abs(posX) >= Math.abs(posY) ? sign(posX) : 0;
+            long gravityY = Math.abs(posY) >= Math.abs(posX) ? sign(posY) : 0;
+            Vector acc = Vector.of(0, 0);
+            if (gravityX != 0 && gravityY !=0) {
+                acc = Vector.of(-gravityX, -gravityY);
+            } else if (velNorm < 8 && posNorm <= 80) {
+                if (gravityX != 0) {
+                    acc = Vector.of(-gravityX, -gravityX);
+                } else {
+                    acc = Vector.of(gravityY, -gravityY);
+                }
+            } else {
+                if (gravityX > 0) {
+                    acc = findAcc(posX, posY, velX, velY, +1);
+                } else if (gravityX < 0) {
+                    acc = findAcc(posX, posY, velX, velY, -1);
+                } else if (gravityY > 0) {
+                    acc = findAcc(posY, posX, velY, velX, +1).orthogonal();
+                } else if (gravityY < 0) {
+                    acc = findAcc(posY, posX, velY, velX, -1).orthogonal();
+                }
+            }
+            if (!acc.isZero()) {
+                Expr accCommand = cons(0, cons(shipId, cons(acc.toExpr(), NIL)));
+                commands = cons(accCommand, commands);
+                System.out.println("accel: " + PrettyPrinter.toPrettyString(accCommand));
+            }
 
-            // Shoot if acc is zero.
-            if (role == 0 && accX == 0 && accY == 0 && otherShip != null) {
+            // Shoot.
+            if (role == 0 && otherShip != null && random.nextFloat() < 0.1) {
                 Expr otherPos = idx(otherShip, 2); // vector
                 Expr otherVel = idx(otherShip, 3); // vector
                 long otherPosX = car(otherPos).asNumber().value;
@@ -146,15 +189,44 @@ class Main {
                 Expr target = cons(
                     otherPosX + otherVelX + random.nextInt(2) - 1,
                     otherPosY + otherVelY + random.nextInt(2) - 1);
-                command = cons(2, cons(shipId, cons(target, cons(10, NIL))));
+                Expr shootCommand = cons(2, cons(shipId, cons(target, cons(64, NIL))));
+                commands = cons(shootCommand, commands);
+                System.out.println("shoot: " + PrettyPrinter.toPrettyString(shootCommand));
             }
-            System.out.println("command: " + PrettyPrinter.toPrettyString(command));
-            Expr commands = cons(command, NIL);
+
+            System.out.println("commands: " + PrettyPrinter.toPrettyString(commands));
             Expr gameReq = cons(4, cons(playerKey, cons(commands, NIL)));
             gameRes = send(URI.create(apiUrl), gameReq);
             System.out.println(PrettyPrinter.toPrettyString(gameRes));
         }
     }
+
+    private static Vector findAcc(long posX, long posY, long velX, long velY, long dX) {
+        Vector best = Vector.of(0, 0);
+        long bestCond = dX * velX * velY - (posY + velY);
+        System.out.println("default cond: " + bestCond);
+        // Save energy!
+        long potentialChangePerTurn = Math.max(Math.abs(velX), Math.abs(velY));
+        if (Math.abs(bestCond) < potentialChangePerTurn) {
+            System.out.println("energy saved as cond is under: " + potentialChangePerTurn);
+            return best;
+        }
+        for (long accX = -2; accX <= -2; accX++) {
+            for (long accY = -2; accY <= -2; accY++) {
+                if (Math.abs(accX) + Math.abs(accY) > 2) {
+                    continue;
+                }
+                long cond = dX * (velX + accX) * (velY + accY) - (posY + velY);
+                if (Math.abs(cond) < Math.abs(bestCond)) {
+                    bestCond = cond;
+                    best = Vector.of(accX, accY);
+                }
+            }
+        }
+        System.out.println("next cond: " + bestCond);
+        return best;
+    }
+    
     static long sign(long num) {
         return num < 0 ? -1 : (num > 0 ? 1 : 0);
     }
