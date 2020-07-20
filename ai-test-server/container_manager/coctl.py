@@ -17,7 +17,7 @@ def command_run(image_name, player_key):
         command="http://localhost:28910 "+player_key,
     )
 
-def command_list(args):
+def command_list():
     client = docker.from_env()
     return client.containers.list(all=True)
 
@@ -46,7 +46,7 @@ def command_rm(player_key):
     c.remove(force=True)
     return
 
-def command_clean(args):
+def command_clean():
     client = docker.from_env()
     client.containers.prune()
     client.images.prune(filters={'dangling': False})
