@@ -140,7 +140,6 @@ class Main {
             { // dir move to 14, 48
               if (Math.abs(posX) > Math.abs(posY)) {
                 moveX = -sign(posX);
-                boostX = sign(posX);
                 if (posY < -14) {
                   moveY = -1;
                   target14 = -14;
@@ -154,7 +153,6 @@ class Main {
                 }
               } else {
                 moveY = -sign(posY);
-                boostY = sign(posY);
                 if (posX > 14) {
                   moveX = 1;
                 } else if (posX < -14) {
@@ -168,6 +166,20 @@ class Main {
                 }
               }
             }
+            if (Math.abs(posX) > Math.abs(posY)) {
+              if (target14 > 0) {
+                boostY = 1;
+              } else {
+                boostY = -1;
+              }
+            } else {
+              if (target14 > 0) {
+                boostX = 1;
+              } else {
+                boostX = -1;
+              }
+            }
+
             if (posX == 48) {
               if(Math.abs(posX - target14) == 0) {
                 moveend = true;
