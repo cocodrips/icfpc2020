@@ -172,7 +172,7 @@ class Main {
                 System.out.println("mode = 2");
                 System.out.println("motionState = " + motionState);
                 if (motionState > 0 || (Math.abs(pos.x) == 14 && vel.x == 0)) {
-                    if (++motionState <= 8) acc = Vector.of(0, sign(pos.x));
+                    if (++motionState <= 8) acc = Vector.of(sign(pos.x), 0);
                 } else if (Math.abs(pos.x) == 14) {
                     acc = Vector.of(vel.x, -gravityY);
                 } else if (motionState == 0) {
