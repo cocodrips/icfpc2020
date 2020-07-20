@@ -1,5 +1,7 @@
-import requests
+import collections
 import sys
+
+import requests
 
 import demodulate
 import modulate
@@ -9,6 +11,14 @@ _API_KEY = '95052afa4bf54914a26622eea251b536'
 _JOIN = 2
 _START = 3
 _COMMANDS = 4
+
+_ACCELERATE = 0
+_DETONATE = 1
+_SHOOT = 2
+_CLONE = 3
+
+
+Point = collections.namedtuple('Point', ['x', 'y'])
 
 
 class Client(object):
@@ -28,6 +38,10 @@ class Client(object):
         return res
 
 
+def _sgn(x):
+    return (x > 0) - (x < 0)
+
+
 def main(argv):
     server_url, player_key = argv[1:]
     player_key = int(player_key)
@@ -38,9 +52,40 @@ def main(argv):
                     player_key)
 
     client.send(_JOIN, [])
-    client.send(_START, [442, 1, 0, 1])
+
+    resp = client.send(_START, [200, 0, 0, 10])
     while True:
-        client.send(_COMMANDS, [])
+        _, stage, info, state = resp
+        _, myrole, *unused = info
+        tick, _, ships = state
+
+        commands = []
+        for ship, _ in ships:
+            role, id, pos, vec, *unused = ship
+            if role != myrole:
+                pass
+            pos = Point(*pos)
+            vec = Point(*vec)
+            print(pos, vec)
+            if (abs(pos.x) <= 72) and (abs(pos.y) <= 72):
+                ax = -_sgn(pos.x)
+                ay = -_sgn(pos.y)
+                commands.append([_ACCELERATE, id, (ax, ay)])
+                continue
+            if abs(pos.x) > abs(pos.y):
+                ax = -_sgn(pos.x) if _sgn(pos.x) != _sgn(vec.x) else 0
+                ay = -_sgn(pos.y) if vec.y == 0 else 0
+                if (ax != 0) or (ay != 0):
+                    commands.append([_ACCELERATE, id, (ax, ay)])
+                continue
+            if abs(pos.x) < abs(pos.y):
+                ay = -_sgn(pos.y) if _sgn(pos.y) != _sgn(vec.y) else 0
+                ax = -_sgn(pos.x) if vec.x == 0 else 0
+                if (ax != 0) or (ay != 0):
+                    commands.append([_ACCELERATE, id, (ax, ay)])
+                continue
+
+        resp = client.send(_COMMANDS, commands)
 
 
 if __name__ == '__main__':
