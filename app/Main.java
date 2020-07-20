@@ -157,7 +157,7 @@ class Main {
                     acc = Vector.of(-gravityX, sign(pos.y - sign(pos.y) * 14));
                     ++motionState;
                 }
-            } else if (role == 0 && Math.abs(pos.y) == 48 && gravixyX == 0) {
+            } else if (role == 0 && Math.abs(pos.y) == 48 && gravityX == 0) {
                 if (motionState > 0 || Math.abs(pos.x) == 14) {
                     if (++motionState <= 8) acc = Vector.of(0, -sign(pos.y));
                 } else if (motionState == 0) {
@@ -205,13 +205,22 @@ class Main {
             }
 
             // Shoot.
-            if (role == 0 && otherShip != null && random.nextFloat() < 0.3) {
+            if (role == 0 && otherShip != null) {
                 Vector otherPos = Vector.fromExpr(idx(otherShip, 2));
                 Vector otherVel = Vector.fromExpr(idx(otherShip, 3));
-                Expr target = cons(otherPos.x + otherVel.x, otherPos.y + otherVel.y);
-                Expr shootCommand = cons(2, cons(shipId, cons(target, cons(64, NIL))));
-                commands = cons(shootCommand, commands);
-                System.out.println("shoot: " + PrettyPrinter.toPrettyString(shootCommand));
+                long ox = otherPos.x + otherVel.x;
+                long oy = otherPos.y + otherVel.y;
+                long mx = pos.x + vel.x;
+                long my = pos.y + vel.y;
+                if (Math.abs(ox - mx) <= 5 && Math.abs(oy - mx) <= 5) {
+                    Expr shootCommand = cons(1, cons(shipId, NIL));
+                    commands = cons(shootCommand, commands);
+                    System.out.println("bang!: " + PrettyPrinter.toPrettyString(shootCommand));
+                } else if (Math.abs(ox - mx) <= 20 && Math.abs(oy - mx) <= 20) {
+                    Expr shootCommand = cons(2, cons(shipId, cons(cons(ox, oy), cons(64, NIL))));
+                    commands = cons(shootCommand, commands);
+                    System.out.println("shoot: " + PrettyPrinter.toPrettyString(shootCommand));
+                }
             }
 
             System.out.println("commands: " + PrettyPrinter.toPrettyString(commands));
