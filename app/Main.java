@@ -123,8 +123,8 @@ class Main {
             long posY = cdr(position).asNumber().value;
             long velX = car(velocity).asNumber().value;
             long velY = cdr(velocity).asNumber().value;
-            long accX = sign(posX);
-            long accY = sign(posY);
+            long accX = -sign(posX);
+            long accY = -sign(posY);
             Expr acc = cons(accX, accY);
             Expr command;
             if (turn > 3 && (turn % 2 == 0)) {
