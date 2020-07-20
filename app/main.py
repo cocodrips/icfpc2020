@@ -1,20 +1,38 @@
 import requests
 import sys
 
+import demodulate
+import modulate
 
-def main():
-    server_url = sys.argv[1]
-    player_key = sys.argv[2]
-    print('ServerUrl: %s; PlayerKey: %s' % (server_url, player_key))
 
-    res = requests.post(server_url, data=player_key)
-    if res.status_code != 200:
-        print('Unexpected server response:')
-        print('HTTP code:', res.status_code)
-        print('Response body:', res.text)
-        exit(2)
-    print('Server response:', res.text)
+class Client(object):
+
+    def __init__(self, url):
+        self.url = url
+
+    def send(self, req):
+        raw_req = modulate.modulate(req)
+        print(f'--> {req!r}; {raw_req}')
+        http_res = requests.post(self.url, data=raw_req)
+        http_res.raise_for_status()
+        raw_res = http_res.text.strip()
+        res = demodulate.demodulate(raw_res)
+        print(f'<-- {res!r}; {raw_res}')
+        return res
+
+
+def main(argv):
+    server_url, player_key = argv[1:]
+    player_key = int(player_key)
+
+    print((server_url, player_key))
+
+    client = Client(f'{server_url}/aliens/send')
+
+    client.send([2, player_key, []])
+    client.send([3, player_key, [500, 0, 0, 1]])
+    while True: client.send([4, player_key, []])
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
