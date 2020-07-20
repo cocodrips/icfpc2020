@@ -23,8 +23,12 @@ class ShipAndCommand:
     ship: Ship
     command: Command
 
+@dataclass
+class GameInfo:
+    space_info: [int]
 
 @dataclass
 class GameState:
+    game_info: GameInfo
     ship_and_commands: [ShipAndCommand]
     size:int = 500

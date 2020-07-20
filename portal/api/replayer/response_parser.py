@@ -12,7 +12,7 @@ def parse(raw_data):
         for ship, commands in ship_and_commands:
             ship_and_command_obj.append(ShipAndCommand(Ship(*ship), Command(commands)))
 
-    return GameState(ship_and_command_obj)
+    return GameState(GameInfo(x3), ship_and_command_obj)
 
 
 if __name__ == '__main__':
