@@ -1,21 +1,8 @@
 import urllib.request
 import json
 import time
+from api.thirdparty.apapnize import apapnize_from_string
 
-def apapnize(e):
-    ty = type(e)
-    if ty == tuple:
-        if len(e) != 2:
-            raise ValueError('input contains tuple of size not 2')
-        return 'ap ap cons {} {}'.format(apapnize(e[0]), apapnize(e[1]))
-    elif ty == list:
-        if len(e) == 0:
-            return 'nil'
-        return 'ap ap cons {} {}'.format(apapnize(e[0]), apapnize(e[1:]))
-    elif ty == int:
-        return e
-    else:
-        raise ValueError('input contains unknown expression')
 
 def send_query(bit, is_real):
     if is_real:
@@ -44,10 +31,8 @@ def call_protocol(protocol, state, value):
     if state == "nil":
         state_a = state
     else:
-        parsed = eval(state.replace('nil', '[]'))
-        state_a = apapnize(parsed)
-    p_value = eval(value)
-    value_a = apapnize(p_value)
+        state_a = apapnize_from_string(state)
+    value_a = apapnize_from_string(value)
     params = {
         'value': "ap_ap_galaxy_"+state_a.replace(" ", "_")+"_"+value_a.replace(" ", "_"),
     }

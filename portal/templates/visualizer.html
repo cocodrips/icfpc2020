@@ -4,61 +4,78 @@
 
 {% block body %}
 
+    <script>
+        function onClick(e) {
+            var rect = e.target.getBoundingClientRect();
+            x = e.clientX - rect.left;
+            y = e.clientY - rect.top;
+            var x_ = parseInt(x / {{ pictures.scale }}) + {{ pictures.xmin}};
+            var y_ = parseInt(y / {{ pictures.scale }}) + {{ pictures.ymin }};
+            document.getElementById("point").innerHTML = `(${x_}, ${y_})`;
+        }
+    </script>
 
-
-    <form action="/visualizer" type="get">
-        <div uk-grid>
-        <div class="uk-width-3-4">
+    <form action="/visualizer" method="post">
+        <div class="uk-flex-center" uk-grid>
+            <div>
             <textarea name="raw_data" placeholder="[flag, state, data]..."
-                      class="uk-textarea uk-width-4-5" cols="100" rows="3"
-                      style="width: 100%">{% if raw_data %}{{ raw_data }}{% endif %}</textarea>
-        </div>
-        <div class="uk-width-1-4">
-            <button class="uk-button uk-button-default" type="submit">visualize</button>
-        </div>
+                      class="uk-textarea" cols="140" rows="3"
+                      style="width: 700px">{% if raw_data %}{{ raw_data }}{% endif %}</textarea>
+            </div>
+            <div>
+                <button class="uk-button uk-button-default" type="submit">
+                    visualize
+                </button>
+            </div>
+
         </div>
     </form>
 
-    <div class="uk-grid uk-margin">
+    <div class="uk-grid uk-margin uk-flex-center">
         {% for image_id in pictures.image_ids %}
-        <div>
-            <p class="uk-margin-small">
-                {{ image_id }}
-            </p>
+            {% if image_id >= 0 %}
 
-            <canvas id="canvas-{{ image_id }}"
-                    width="{{ pictures.width * pictures.scale }}"
-                    height="{{ pictures.height * pictures.scale }}"></canvas>
-            <script>
-                var colors = ["#8eeee3","#a66ad1","#ff67a7","#9ed76e"];
-                var canvas = document.getElementById("canvas-{{ image_id }}");
-                var context = canvas.getContext("2d");
-                context.scale({{ pictures.scale }}, {{ pictures.scale }});
+            <div>
+                <p class="uk-margin-small">
+                    {{ image_id }}
+                </p>
 
-                context.fillStyle = "black";
-                context.fillRect(0, 0, canvas.width, canvas.height);
+                <canvas id="canvas-{{ image_id }}"
+                        width="{{ pictures.width * pictures.scale }}"
+                        height="{{ pictures.height * pictures.scale }}"></canvas>
+                <script>
+                    var colors = ["#8eeee3", "#a66ad1", "#ff67a7", "#9ed76e"];
+                    var canvas = document.getElementById("canvas-{{ image_id }}");
+                    canvas.addEventListener('click', onClick, false);
+                    var context = canvas.getContext("2d");
+                    context.scale({{ pictures.scale }}, {{ pictures.scale }});
 
-                context.fillStyle = "red";
-                context.fillRect({{ -pictures.xmin }}, {{ -pictures.ymin }}, 1, 1);
+                    context.fillStyle = "black";
+                    context.fillRect(0, 0, canvas.width, canvas.height);
 
-                context.fillStyle = "#20cfcd";
-                context.globalAlpha = 0.5;
-                var i = 0;
+                    context.fillStyle = "red";
+                    context.fillRect({{ -pictures.xmin }}, {{ -pictures.ymin }}, 1, 1);
 
-                {% for picture in pictures.pictures %}
-                    {% if picture.image_id == image_id %}
-                        context.fillStyle = colors[i%10];
-                        console.log(i, colors[i%colors.length]);
-                        {% for point in picture.points %}
-                            context.fillRect({{ point[0] - pictures.xmin }}, {{ point[1] - pictures.ymin }}, 1, 1);
-                        {% endfor %}
-                        i++;
+                    context.fillStyle = "#20cfcd";
+                    context.globalAlpha = 0.5;
+                    var i = 0;
 
-                    {% endif %}
-                {% endfor %}
-            </script>
+                    {% for picture in pictures.pictures %}
+                        {% if picture.image_id == image_id %}
+                            context.fillStyle = colors[i % 10];
+                            console.log(i, colors[i % colors.length]);
+                            {% for point in picture.points %}
+                                context.fillRect({{ point[0] - pictures.xmin }}, {{ point[1] - pictures.ymin }}, 1, 1);
+                            {% endfor %}
+                            i++;
 
-        </div>
+                        {% endif %}
+                    {% endfor %}
+                </script>
+
+            </div>
+            {% endif %}
+
         {% endfor %}
     </div>
 {% endblock %}

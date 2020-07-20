@@ -1,24 +1,22 @@
-import os
+import json
 
 from flask import Flask, request, render_template, Response
 from api import modem, visualizer, interactor
 from api.protocol import galaxy
 from jinja2 import Template, Environment, FileSystemLoader
-import json
 
 app = Flask(__name__)
 
 
 # web interface
-@app.route('/modem')
+@app.route('/modem', methods=["GET", "POST"])
 def demodulator_web():
-    demodulator_binary = request.args.get("demodulator-binary")
+    demodulator_binary = request.form.get("demodulator-binary")
     demodulator_output = modem.demodulate(demodulator_binary)
 
-    modulator_list = request.args.get("modulator-list")
+    modulator_list = request.form.get("modulator-list")
     modulator_output = modem.modulate(modulator_list)
     modulator_func = modem.demodulate(modulator_output)
-    print(modulator_output)
     return render_template("modem.html",
                            demodulator_binary=demodulator_binary,
                            demodulator_output=demodulator_output,
@@ -37,10 +35,9 @@ def galaxy_web():
             gal_var=gal_var,
             galaxy_output=galaxy_output)
 
-@app.route('/visualizer')
+@app.route('/visualizer', methods=["GET", "POST"])
 def visualizer_web():
-    raw_data = request.args.get("raw_data")
-
+    raw_data = request.form.get("raw_data")
     pictures = visualizer.visualize(raw_data)
 
     return render_template("visualizer.html",

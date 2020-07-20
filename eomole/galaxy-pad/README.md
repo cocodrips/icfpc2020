@@ -17,6 +17,6 @@ sbt runMain galaxy.GalaxyInteract
 ## Run
 
 ```
-java -Xss1g -jar seglang.jar
+java -Xss1g -jar galaxy.jar [modulated state] [modulated events]
 ```
 
