@@ -96,6 +96,10 @@ class Main {
         Random random = new Random();
         long dirX = 0;
         long dirY = 0;
+        long origPosX = 0;
+        long origPosY = 0;
+        boolean origDim = true;
+        boolean firstDim = true;
         while (true) {
             long stage = idx(gameRes, 1).asNumber().value;
             if (stage == 2) { break; }
@@ -126,18 +130,42 @@ class Main {
             System.out.println("posX: " + posX + "posY: " + posY);
             long velX = car(velocity).asNumber().value;
             long velY = cdr(velocity).asNumber().value;
-            if (turn < 2) {
-              if (Math.abs(posX) > Math.abs(posY)) {
-                dirX = -sign(posX) * 2;
-                dirY = -sign(posX) * 2;
-              } else {
-                dirX = sign(posY) * 2;
-                dirY = -sign(posY) * 2;
-              }
-            } else {
-              dirX = 0;
-              dirY = 0;
+            if (turn == 0) {
+              origPosX = posX;
+              origPosY = posY;
+              origDim = Math.abs(posX) > Math.abs(posY);
             }
+            if (turn == 0) {
+              if (Math.abs(posX) > Math.abs(posY)) {
+                dirX = -sign(origPosX);
+                dirY = sign(origPosY);
+              } else {
+                dirX = sign(origPosX);
+                dirY = -sign(origPosY);
+              }
+            }
+            long accX = 0;
+            long accY = 0;
+            if (turn < 8) {
+              if (Math.abs(posX) > Math.abs(posY)) {
+                accY = dirY;
+              } else {
+                accX = dirX;
+              }
+            }
+            if (firstDim &&  (origDim == (Math.abs(posX) > Math.abs(posY)))) {
+              if (turn >= 2) {
+                if (Math.abs(posX) > Math.abs(posY)) {
+                  accX = dirX;
+                } else {
+                  accY = dirY;
+                }
+              }
+            }
+            if (firstDim && (origDim != (Math.abs(posX) > Math.abs(posY)))) {
+              firstDim = false;
+            }
+
             Expr acc = cons(dirX, dirY);
             Expr command = cons(0, cons(shipId, cons(acc, NIL)));
 
