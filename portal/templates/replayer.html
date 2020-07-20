@@ -52,22 +52,30 @@
             function draw(state) {
                 var star_scale = 16;
                 var power = 1.5;
+                var scale = 500 / power;
+                var area_scale = scale;
 
                 console.log(state.game_info.space_info);
-                {#if (state.game_info.space_info) {#}
-                {#    power = 500 /(state.game_info.space_info[1]*2);#}
-                {#    star_scale = state.game_info.space_info[0];#}
-                {#}#}
+                if (state.game_info.space_info) {
+                    star_scale = state.game_info.space_info[0];
+                    area_scale = state.game_info.space_info[1];
+                }
 
-                var scale = 500 / power ;
                 var status = document.getElementById("status");
                 var canvas = document.getElementById("canvas");
                 var context = canvas.getContext("2d");
                 context.resetTransform();
-                context.fillStyle = "black";
+                context.fillStyle = "#202020";
                 context.fillRect(0, 0, canvas.width, canvas.height);
-
                 context.scale(power, power);
+
+                context.fillStyle = "black";
+                console.log(scale / 2, area_scale)
+                context.fillRect(scale / 2 - area_scale,
+                    scale / 2 - area_scale,
+                    area_scale*2, area_scale*2);
+
+
                 context.fillStyle = "white";
                 context.fillRect(
                     scale / 2 - star_scale / 2, scale / 2 - star_scale / 2, star_scale, star_scale);
@@ -77,7 +85,7 @@
 
                 var shootColors = ["rgba(142,238,227,0.4)", "rgba(255,103,167,0.38)"];
 
-                var debugstr = "";
+                var debugstr = JSON.stringify(state.game_info) + '\n---\n';
 
                 for (const target of state.ship_and_commands) {
                     context.fillStyle = colors[target.ship.role];

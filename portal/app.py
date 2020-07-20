@@ -68,7 +68,7 @@ def game_web():
 
     res = requests.get("http://104.197.240.151:28910/status")
     if res.status_code == 200:
-        status = json.loads(res.text)
+        status = json.loads(res.text)[::-1]
 
     return render_template("game.html",
                            attacker=attacker,
