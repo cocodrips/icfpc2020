@@ -182,11 +182,17 @@ class Main {
               accX = moveX;
               accY = moveY;
               movestarted = true;
+            } else if (movestarted && !moveend && !booststarted) {
+              if (Math.abs(posX) > Math.abs(posY)) {
+                moveX = -sign(posX);
+              } else {
+                moveY = -sign(posY);
+              }
             } else if (movestarted && moveend && !booststarted) {
               if (Math.abs(posX) > Math.abs(posY)) {
-                accY = moveY;
+                accY = -moveY;
               } else {
-                accX = moveX;
+                accX = -moveX;
               }
               booststarted = true;
             } else if(movestarted && moveend && booststarted) {
