@@ -107,7 +107,7 @@ class Main {
         System.out.println(PrettyPrinter.toPrettyString(res2));
 
         // Change here to stop children!
-        long shipCount = 15;
+        long shipCount = 1;
         Expr data = cons(
             200, cons(30, cons(shipCount == 1 ? 10 : 1, cons(shipCount, NIL))));
         Expr req3 = cons(3, cons(playerKey, cons(data, NIL)));
