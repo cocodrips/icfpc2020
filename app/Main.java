@@ -158,13 +158,13 @@ class Main {
                 }
             } else if (pos.l2Norm() < 90) {
                 if (gravityX > 0) {
-                    acc = findAcc(pos.x, pos.y, vel.x, vel.y, +1);
+                    acc = findAcc(pos.x, pos.y, vel.x, vel.y, gravityX, gravityY, +1);
                 } else if (gravityX < 0) {
-                    acc = findAcc(pos.x, pos.y, vel.x, vel.y, -1);
+                    acc = findAcc(pos.x, pos.y, vel.x, vel.y, gravityX, gravityY, -1);
                 } else if (gravityY > 0) {
-                    acc = findAcc(pos.y, pos.x, vel.y, vel.x, +1).swapped();
+                    acc = findAcc(pos.y, pos.x, vel.y, vel.x, gravityY, gravityX, +1).swapped();
                 } else if (gravityY < 0) {
-                    acc = findAcc(pos.y, pos.x, vel.y, vel.x, -1).swapped();
+                    acc = findAcc(pos.y, pos.x, vel.y, vel.x, gravityY, gravityX, -1).swapped();
                 }
             }
             if (!acc.isZero()) {
@@ -190,8 +190,13 @@ class Main {
         }
     }
 
-    private static Vector findAcc(long posX, long posY, long velX, long velY, long dX) {
+    private static Vector findAcc(
+        long posX, long posY, long velX, long velY, long gX, long gY, long dX) {
         Vector best = Vector.of(0, 0);
+        if (Math.abs(posX) < 5 || Math.abs(posY) < 5) {
+            System.out.println("cond can't be calced here.");
+            return best;
+        }
         // Fix shape
         if (Math.abs(Math.abs(posX) - Math.abs(posY)) < 10) {
             if (Math.abs(velX) > Math.abs(velY) + 2) {
@@ -218,7 +223,7 @@ class Main {
                     System.out.println("too fast.");
                     continue;
                 }
-                long cond = dX * (velX - accX) * (velY - accY) + (posY + velY);
+                long cond = dX * (velX - accX - gX) * (velY - accY - gY) + (posY + velY);
                 if (Math.abs(cond) < Math.abs(bestCond)) {
                     bestCond = cond;
                     best = Vector.of(accX, accY);
