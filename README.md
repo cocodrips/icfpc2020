@@ -1,8 +1,7 @@
 # ICFPC2020
 
-## [portal](https://portal-prtffs3u5a-uw.a.run.app/) 
-- [https://portal-prtffs3u5a-uw.a.run.app/](https://portal-prtffs3u5a-uw.a.run.app/)
-- visualizer, modem
+## portal
+- visualizer, modem, repleyer, local game 
 
 ## 手順
 
