@@ -156,6 +156,14 @@ class Main {
                 } else {
                     acc = Vector.of(gravityX, 0);
                 }
+            } else if (role == 0 && Math.abs(pos.y) == 48 && gravityX == 0) {
+                if (motionState > 0 || Math.abs(pos.x) == 14) {
+                    if (++motionState <= 8) acc = Vector.of(0, -sign(pos.y));
+                } else if (vel.x == 0) {
+                    acc = Vector.of(sign(pos.x - sign(pos.x) * 14), gravityY);
+                } else {
+                    acc = Vector.of(0, gravityY);
+                }
             } else if (gravityX != 0 && gravityY != 0) {
                 acc = Vector.of(gravityY, -gravityX);
             } else if ((vel.l2Norm() < 8 && pos.l2Norm() <= 80) || pos.l2Norm() <= 35) {
