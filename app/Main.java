@@ -86,7 +86,7 @@ class Main {
 
         System.out.println(PrettyPrinter.toPrettyString(res2));
 
-        Expr data = cons(250, cons(0, cons(8, cons(100, NIL))));
+        Expr data = cons(150, cons(0, cons(8, cons(100, NIL))));
         Expr req3 = cons(3, cons(playerKey, cons(data, NIL)));
         Expr gameRes = send(URI.create(apiUrl), req3);
         Expr staticGameInfo = idx(gameRes, 2);
