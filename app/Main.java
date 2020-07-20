@@ -131,10 +131,7 @@ class Main {
             }
             long accX = 0;
             long accY = 0;
-            if (turn == 1) {
-              accX = 2*grabX;
-              accY = 2*grabY;
-            } else if (turn > 1) {
+            if (turn >= 1) {
               accX = grabX;
               accY = grabY;
             }
