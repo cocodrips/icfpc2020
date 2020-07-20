@@ -86,7 +86,7 @@ class Main {
 
         System.out.println(PrettyPrinter.toPrettyString(res2));
 
-        Expr data = cons(260 , cons(0, cons(0, cons(1, NIL))));
+        Expr data = cons(152, cons(0, cons(8, cons(100, NIL))));
         Expr req3 = cons(3, cons(playerKey, cons(data, NIL)));
         Expr gameRes = send(URI.create(apiUrl), req3);
         Expr staticGameInfo = idx(gameRes, 2);
@@ -126,13 +126,13 @@ class Main {
             System.out.println("posX: " + posX + "posY: " + posY);
             long velX = car(velocity).asNumber().value;
             long velY = cdr(velocity).asNumber().value;
-            if (turn < 15) {
+            if (turn < 2) {
               if (Math.abs(posX) > Math.abs(posY)) {
-                dirX = -sign(posX);
-                dirY = -sign(posX);
+                dirX = -sign(posX) * 2;
+                dirY = -sign(posX) * 2;
               } else {
-                dirX = sign(posY);
-                dirY = -sign(posY);
+                dirX = sign(posY) * 2;
+                dirY = -sign(posY) * 2;
               }
             } else {
               dirX = 0;
