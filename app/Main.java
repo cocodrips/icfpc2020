@@ -3,6 +3,8 @@ package app;
 import java.io.*;
 import java.net.*;
 import java.net.http.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Vector;
 
@@ -110,6 +112,7 @@ class Main {
         System.out.println(PrettyPrinter.toPrettyString(gameRes));
         Expr staticGameInfo = idx(gameRes, 2);
         long role = idx(staticGameInfo, 1).asNumber().value;
+        long mainShipId = -1;
 
         Random random = new Random();
         while (true) {
@@ -117,89 +120,101 @@ class Main {
             if (stage == 2) { break; }
             Expr gameState = idx(gameRes, 3);
             Expr shipsAndComands = idx(gameState, 2);
-            Expr myShip = null;
-            Expr otherShip = null;
+            List<Expr> myShips = new ArrayList<>();
+            List<Expr> otherShips = new ArrayList<>();
             while (!(shipsAndComands instanceof Nil)) {
                 Expr shipAndComand = car(shipsAndComands);
                 Expr ship = car(shipAndComand);
                 if (idx(ship, 0).asNumber().value == role) {
-                    myShip = ship;
+                    myShips.add(ship);
+                    if (mainShipId < 0) {
+                        mainShipId = idx(ship, 1).asNumber().value;
+                    }
                     System.out.println(
                         "executed:" + PrettyPrinter.toPrettyString(idx(shipAndComand, 1)));
                 } else {
-                    otherShip = ship;
+                    otherShips.add(ship);
                 }
                 shipsAndComands = cdr(shipsAndComands);
             }
-            if (myShip == null) {
+            if (myShips.isEmpty()) {
                 break;
             }
-
             // Generate commands.
             Expr commands = NIL;
-
-            // Rotate.
-            long shipId = idx(myShip, 1).asNumber().value;
-            Vector pos = Vector.fromExpr(idx(myShip, 2));
-            System.out.println("pos: " + pos);
-            Vector vel = Vector.fromExpr(idx(myShip, 3));
-            System.out.println("vel: " + vel);
-            long gravityX = Math.abs(pos.x) >= Math.abs(pos.y) ? sign(pos.x) : 0;
-            long gravityY = Math.abs(pos.y) >= Math.abs(pos.x) ? sign(pos.y) : 0;
-            Vector acc = Vector.of(0, 0);
-            if (gravityX != 0 && gravityY !=0) {
-                acc = Vector.of(gravityY, -gravityX);
-            } else if ((vel.l2Norm() < 8 && pos.l2Norm() <= 80) || pos.l2Norm() <= 35) {
-                // Initial state or emergency.
-                if (gravityX != 0) {
-                    acc = Vector.of(-gravityX, -gravityX);
-                } else {
-                    acc = Vector.of(gravityY, -gravityY);
-                }
-            } else if (pos.l2Norm() < 90) {
-                if (gravityX > 0) {
-                    acc = findAcc(pos.x, pos.y, vel.x, vel.y, gravityX, gravityY, +1);
-                } else if (gravityX < 0) {
-                    acc = findAcc(pos.x, pos.y, vel.x, vel.y, gravityX, gravityY, -1);
-                } else if (gravityY > 0) {
-                    acc = findAcc(pos.y, pos.x, vel.y, vel.x, gravityY, gravityX, +1).swapped();
-                } else if (gravityY < 0) {
-                    acc = findAcc(pos.y, pos.x, vel.y, vel.x, gravityY, gravityX, -1).swapped();
-                }
+            for (Expr ship : myShips) {
+                long shipId = idx(ship, 1).asNumber().value;
+                commands = createCommands(
+                    commands, ship, role, shipId == mainShipId, myShips, otherShips, random);
             }
-            boolean xRisk =
-                sign(pos.x) == sign(vel.x) && (Math.abs(pos.x) > 90 || Math.abs(vel.x) >= 10);
-            if (xRisk) {
-                System.out.println("risky x.");
-                acc = Vector.of(sign(pos.x), acc.y);
-            }
-            boolean yRisk =
-                sign(pos.y) == sign(vel.y) && (Math.abs(pos.y) > 90 || Math.abs(vel.y) >= 10);
-            if (yRisk) {
-                System.out.println("risky y.");
-                acc = Vector.of(acc.x, sign(pos.y));
-            }
-            if (!acc.isZero()) {
-                Expr accCommand = cons(0, cons(shipId, cons(acc.toExpr(), NIL)));
-                commands = cons(accCommand, commands);
-                System.out.println("accel: " + PrettyPrinter.toPrettyString(accCommand));
-            }
-
-            // Shoot.
-            if (role == 0 && otherShip != null && random.nextFloat() < 0.3) {
-                Vector otherPos = Vector.fromExpr(idx(otherShip, 2));
-                Vector otherVel = Vector.fromExpr(idx(otherShip, 3));
-                Expr target = cons(otherPos.x + otherVel.x, otherPos.y + otherVel.y);
-                Expr shootCommand = cons(2, cons(shipId, cons(target, cons(64, NIL))));
-                commands = cons(shootCommand, commands);
-                System.out.println("shoot: " + PrettyPrinter.toPrettyString(shootCommand));
-            }
-
             System.out.println("commands: " + PrettyPrinter.toPrettyString(commands));
             Expr gameReq = cons(4, cons(playerKey, cons(commands, NIL)));
             gameRes = send(URI.create(apiUrl), gameReq);
             System.out.println(PrettyPrinter.toPrettyString(gameRes));
         }
+    }
+
+    private static Expr createCommands(
+        Expr commands, Expr ship, long role, boolean isMain,
+        List<Expr> myShips, List<Expr> otherShips, Random random) {
+        long shipId = idx(ship, 1).asNumber().value;
+        // Rotate.
+        Vector pos = Vector.fromExpr(idx(ship, 2));
+        System.out.println("pos: " + pos);
+        Vector vel = Vector.fromExpr(idx(ship, 3));
+        System.out.println("vel: " + vel);
+        long gravityX = Math.abs(pos.x) >= Math.abs(pos.y) ? sign(pos.x) : 0;
+        long gravityY = Math.abs(pos.y) >= Math.abs(pos.x) ? sign(pos.y) : 0;
+        Vector acc = Vector.of(0, 0);
+        if (gravityX != 0 && gravityY !=0) {
+            acc = Vector.of(gravityY, -gravityX);
+        } else if ((vel.l2Norm() < 8 && pos.l2Norm() <= 80) || pos.l2Norm() <= 35) {
+            // Initial state or emergency.
+            if (gravityX != 0) {
+                acc = Vector.of(-gravityX, -gravityX);
+            } else {
+                acc = Vector.of(gravityY, -gravityY);
+            }
+        } else if (pos.l2Norm() < 90) {
+            if (gravityX > 0) {
+                acc = findAcc(pos.x, pos.y, vel.x, vel.y, gravityX, gravityY, +1);
+            } else if (gravityX < 0) {
+                acc = findAcc(pos.x, pos.y, vel.x, vel.y, gravityX, gravityY, -1);
+            } else if (gravityY > 0) {
+                acc = findAcc(pos.y, pos.x, vel.y, vel.x, gravityY, gravityX, +1).swapped();
+            } else if (gravityY < 0) {
+                acc = findAcc(pos.y, pos.x, vel.y, vel.x, gravityY, gravityX, -1).swapped();
+            }
+        }
+        boolean xRisk =
+            sign(pos.x) == sign(vel.x) && (Math.abs(pos.x) > 90 || Math.abs(vel.x) >= 10);
+        if (xRisk) {
+            System.out.println("risky x.");
+            acc = Vector.of(sign(pos.x), acc.y);
+        }
+        boolean yRisk =
+            sign(pos.y) == sign(vel.y) && (Math.abs(pos.y) > 90 || Math.abs(vel.y) >= 10);
+        if (yRisk) {
+            System.out.println("risky y.");
+            acc = Vector.of(acc.x, sign(pos.y));
+        }
+        if (!acc.isZero()) {
+            Expr accCommand = cons(0, cons(shipId, cons(acc.toExpr(), NIL)));
+            commands = cons(accCommand, commands);
+            System.out.println("accel: " + PrettyPrinter.toPrettyString(accCommand));
+        }
+
+        // Shoot.
+        if (role == 0 && !otherShips.isEmpty() && random.nextFloat() < 0.3) {
+            Expr otherShip = otherShips.get(random.nextInt(otherShips.size()));
+            Vector otherPos = Vector.fromExpr(idx(otherShip, 2));
+            Vector otherVel = Vector.fromExpr(idx(otherShip, 3));
+            Expr target = cons(otherPos.x + otherVel.x, otherPos.y + otherVel.y);
+            Expr shootCommand = cons(2, cons(shipId, cons(target, cons(64, NIL))));
+            commands = cons(shootCommand, commands);
+            System.out.println("shoot: " + PrettyPrinter.toPrettyString(shootCommand));
+        }
+        return commands;
     }
 
     private static Vector findAcc(
