@@ -5,3 +5,4 @@ steps:
   args: ['build', '-f', './dockerfiles/dockerfiles/python/Dockerfile', '-t', 'client:$SHORT_SHA', '.']
   #- name: 'gcr.io/cloud-builders/docker'
   #  args: ['run', "--network=cloudbuild",'--entrypoint=./strict_run.sh', '-t', 'client:$SHORT_SHA', 'https://dummy-server-prtffs3u5a-uc.a.run.app/', 'test_key']
+images: ['gcr.io/$PROJECT_ID/client:$SHORT_SHA']
