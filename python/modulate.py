@@ -19,5 +19,9 @@ def modulate(expr):
     raise ValueError(f'invalid expression: {expr!r}')
 
 
+def modulate_from_string(s):
+    return modulate(eval(s.replace('nil', '[]')))
+
+
 if __name__ == '__main__':
-    print(modulate(eval(input().replace('nil', '[]'))))
+    print(modulate_from_string(input()))
