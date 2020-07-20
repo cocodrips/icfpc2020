@@ -112,6 +112,7 @@ class Main {
         long role = idx(staticGameInfo, 1).asNumber().value;
 
         Random random = new Random();
+        int motionState = 0;
         while (true) {
             long stage = idx(gameRes, 1).asNumber().value;
             if (stage == 2) { break; }
@@ -147,7 +148,15 @@ class Main {
             long gravityX = Math.abs(pos.x) >= Math.abs(pos.y) ? sign(pos.x) : 0;
             long gravityY = Math.abs(pos.y) >= Math.abs(pos.x) ? sign(pos.y) : 0;
             Vector acc = Vector.of(0, 0);
-            if (gravityX != 0 && gravityY !=0) {
+            if (role == 0 && Math.abs(pos.x) == 48 && gravityY == 0) {
+                if (motionState > 0 || Math.abs(pos.y) == 14) {
+                    if (++motionState <= 8) acc = Vector.of(-sign(pos.x), 0);
+                } else if (vel.y == 0) {
+                    acc = Vector.of(gravityX, sign(pos.y - sign(pos.y) * 14));
+                } else {
+                    acc = Vector.of(gravityX, 0);
+                }
+            } else if (gravityX != 0 && gravityY != 0) {
                 acc = Vector.of(gravityY, -gravityX);
             } else if ((vel.l2Norm() < 8 && pos.l2Norm() <= 80) || pos.l2Norm() <= 35) {
                 // Initial state or emergency.
