@@ -98,6 +98,7 @@ class Main {
             long stage = idx(gameRes, 1).asNumber().value;
             if (stage == 2) { break; }
             Expr gameState = idx(gameRes, 3);
+            long turn = idx(gameState, 0).asNumber().value;
             Expr shipsAndComands = idx(gameState, 2);
             Expr myShip = null;
             Expr otherShip = null;
@@ -133,11 +134,8 @@ class Main {
                     ? 0
                     : (Math.abs(velY) < 8 ? -sign(posX) : 0));
             Expr acc = cons(accX, accY);
-            Expr command = cons(0, cons(shipId, cons(acc, NIL)));
+            Expr command = cons(3, cons( cons(0, cons(0, cons(0, cons(1, NIL)))) , NIL));
 
-            if (role == 0 && accX == 0 && accY == 0) {
-                command = cons(3, cons(0, 0, 0, 0));
-            }
             System.out.println("command: " + PrettyPrinter.toPrettyString(command));
             Expr commands = cons(command, NIL);
             Expr gameReq = cons(4, cons(playerKey, cons(commands, NIL)));
