@@ -152,18 +152,18 @@ class Main {
                 if (motionState > 0 || Math.abs(pos.y) == 14) {
                     if (++motionState <= 8) acc = Vector.of(-sign(pos.x), 0);
                 } else if (motionState == 0) {
-                    acc = Vector.of(gravityX, 0);
+                    acc = Vector.of(-gravityX, 0);
                 } else {
-                    acc = Vector.of(gravityX, sign(pos.y - sign(pos.y) * 14));
+                    acc = Vector.of(-gravityX, sign(pos.y - sign(pos.y) * 14));
                     ++motionState;
                 }
-            } else if (role == 0 && Math.abs(pos.y) == 48 && gravityX == 0) {
+            } else if (role == 0 && Math.abs(pos.y) == 48 && gravixyX == 0) {
                 if (motionState > 0 || Math.abs(pos.x) == 14) {
                     if (++motionState <= 8) acc = Vector.of(0, -sign(pos.y));
                 } else if (motionState == 0) {
-                    acc = Vector.of(0, gravityY);
+                    acc = Vector.of(0, -gravityY);
                 } else {
-                    acc = Vector.of(sign(pos.x - sign(pos.x) * 14), gravityY);
+                    acc = Vector.of(sign(pos.x - sign(pos.x) * 14), -gravityY);
                     ++motionState;
                 }
             } else if (gravityX != 0 && gravityY != 0) {
