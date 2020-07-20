@@ -167,6 +167,18 @@ class Main {
                     acc = findAcc(pos.y, pos.x, vel.y, vel.x, gravityY, gravityX, -1).swapped();
                 }
             }
+            boolean xRisk =
+                sign(pos.x) == sign(vel.x) && (Math.abs(pos.x) > 90 || Math.abs(vel.x) >= 10);
+            if (xRisk) {
+                System.out.println("risky x.");
+                acc = Vector.of(sign(pos.x), acc.y);
+            }
+            boolean yRisk =
+                sign(pos.y) == sign(vel.y) && (Math.abs(pos.y) > 90 || Math.abs(vel.y) >= 10);
+            if (yRisk) {
+                System.out.println("risky y.");
+                acc = Vector.of(acc.x, sign(pos.y));
+            }
             if (!acc.isZero()) {
                 Expr accCommand = cons(0, cons(shipId, cons(acc.toExpr(), NIL)));
                 commands = cons(accCommand, commands);
