@@ -1,20 +1,47 @@
 import requests
 import sys
 
+import demodulate
+import modulate
 
-def main():
-    server_url = sys.argv[1]
-    player_key = sys.argv[2]
-    print('ServerUrl: %s; PlayerKey: %s' % (server_url, player_key))
 
-    res = requests.post(server_url, data=player_key)
-    if res.status_code != 200:
-        print('Unexpected server response:')
-        print('HTTP code:', res.status_code)
-        print('Response body:', res.text)
-        exit(2)
-    print('Server response:', res.text)
+_API_KEY = '95052afa4bf54914a26622eea251b536'
+_JOIN = 2
+_START = 3
+_COMMANDS = 4
+
+
+class Client(object):
+
+    def __init__(self, url, key):
+        self.url = url
+        self.key = key
+
+    def send(self, cmd, arg):
+        req = [cmd, self.key, arg]
+        print(f'--> {req!r}')
+        res = requests.post(self.url, data=modulate.modulate(req))
+        res.raise_for_status()
+        res = demodulate.demodulate(res.text.strip())
+        print(f'<-- {res!r}')
+        if res == [0]: sys.exit('request error')
+        return res
+
+
+def main(argv):
+    server_url, player_key = argv[1:]
+    player_key = int(player_key)
+
+    print((server_url, player_key))
+
+    client = Client(f'{server_url}/aliens/send?apiKey={_API_KEY}',
+                    player_key)
+
+    client.send(_JOIN, [])
+    client.send(_START, [442, 1, 0, 1])
+    while True:
+        client.send(_COMMANDS, [])
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
