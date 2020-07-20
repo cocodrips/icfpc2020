@@ -146,7 +146,7 @@ class Main {
             long accY = 0;
             if (turn < 8) {
               if (Math.abs(posX) > Math.abs(posY)) {
-                accY = dirY + velX * 2;
+                accY = dirY;
               } else {
                 accX = dirX;
               }
