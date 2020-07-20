@@ -134,8 +134,6 @@ class Main {
               origPosX = posX;
               origPosY = posY;
               firstDim = Math.abs(posX) > Math.abs(posY);
-            }
-            if (turn == 0) {
               if (Math.abs(posX) > Math.abs(posY)) {
                 dirX = -sign(origPosX);
                 dirY = sign(origPosY);
@@ -166,7 +164,7 @@ class Main {
               firstDim = false;
             }
 
-            Expr acc = cons(dirX, dirY);
+            Expr acc = cons(accX, accY);
             Expr command = cons(0, cons(shipId, cons(acc, NIL)));
 
             System.out.println("command: " + PrettyPrinter.toPrettyString(command));
