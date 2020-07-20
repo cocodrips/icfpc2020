@@ -126,22 +126,13 @@ class Main {
             System.out.println("posX: " + posX + "posY: " + posY);
             long velX = car(velocity).asNumber().value;
             long velY = cdr(velocity).asNumber().value;
-            if (turn < 6) {
+            if (turn < 15) {
               if (Math.abs(posX) > Math.abs(posY)) {
                 dirX = -sign(posX);
                 dirY = -sign(posX);
               } else {
                 dirX = -sign(posY);
                 dirY = -sign(posY);
-              }
-            }
-            else if (turn < 8) {
-              if (Math.abs(posX) > Math.abs(posY)) {
-                dirX = -sign(posX)*2;
-                dirY = -sign(posX)*2;
-              } else {
-                dirX = -sign(posY)*2;
-                dirY = -sign(posY)*2;
               }
             } else {
               dirX = 0;
