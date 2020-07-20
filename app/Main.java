@@ -73,6 +73,7 @@ class Main {
             return Vector.of(car(expr).asNumber().value, cdr(expr).asNumber().value);
         }
         public Vector orthogonal() { return Vector.of(y, -x); }
+        public Vector swapped() { return Vector.of(y, x); }
         public Expr toExpr() { return cons(x, y); }
         public boolean isZero() { return x == 0 && y == 0; }
         public long l1Norm() { return Math.abs(x) + Math.abs(y); }
@@ -147,7 +148,7 @@ class Main {
             long gravityY = Math.abs(pos.y) >= Math.abs(pos.x) ? sign(pos.y) : 0;
             Vector acc = Vector.of(0, 0);
             if (gravityX != 0 && gravityY !=0) {
-                acc = Vector.of(-gravityX, -gravityY);
+                acc = Vector.of(gravityY, -gravityX);
             } else if ((vel.l2Norm() < 8 && pos.l2Norm() <= 80) || pos.l2Norm() <= 35) {
                 // Initial state or emergency.
                 if (gravityX != 0) {
@@ -155,15 +156,15 @@ class Main {
                 } else {
                     acc = Vector.of(gravityY, -gravityY);
                 }
-            } else {
+            } else if (pos.l2Norm() < 90) {
                 if (gravityX > 0) {
                     acc = findAcc(pos.x, pos.y, vel.x, vel.y, +1);
                 } else if (gravityX < 0) {
                     acc = findAcc(pos.x, pos.y, vel.x, vel.y, -1);
                 } else if (gravityY > 0) {
-                    acc = findAcc(pos.y, pos.x, vel.y, vel.x, +1).orthogonal();
+                    acc = findAcc(pos.y, pos.x, vel.y, vel.x, +1).swapped();
                 } else if (gravityY < 0) {
-                    acc = findAcc(pos.y, pos.x, vel.y, vel.x, -1).orthogonal();
+                    acc = findAcc(pos.y, pos.x, vel.y, vel.x, -1).swapped();
                 }
             }
             if (!acc.isZero()) {
@@ -194,10 +195,10 @@ class Main {
         // Fix shape
         if (Math.abs(Math.abs(posX) - Math.abs(posY)) < 10) {
             if (Math.abs(velX) > Math.abs(velY) + 2) {
-                System.out.println("too horizontal shape.");
+                System.out.println("too narrow shape.");
                 return Vector.of(sign(velX), -sign(velY));
             } else if (Math.abs(velY) > Math.abs(velX) + 2) {
-                System.out.println("too vertical shape.");
+                System.out.println("too narrow shape.");
                 return Vector.of(-sign(velX), sign(velY));
             }
         }
@@ -209,9 +210,12 @@ class Main {
             System.out.println("energy saved as cond is under: " + potentialChangePerTurn);
             return best;
         }
-        for (long accX = -2; accX <= -2; accX++) {
-            for (long accY = -2; accY <= -2; accY++) {
-                if (Math.abs(accX) + Math.abs(accY) > 2) {
+        double originalNorm = Vector.of(velX, velY ).lInfNorm();
+        for (long accX = -1; accX <= 1; accX++) {
+            for (long accY = -1; accY <= 1; accY++) {
+                double afterNorm = Vector.of(velX + accX, velY + accY).lInfNorm();
+                if (afterNorm >= 10 && afterNorm >= originalNorm) {
+                    System.out.println("too fast.");
                     continue;
                 }
                 long cond = dX * (velX - accX) * (velY - accY) + (posY + velY);
