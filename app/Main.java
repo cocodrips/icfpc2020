@@ -123,15 +123,25 @@ class Main {
             Expr velocity = idx(myShip, 3); // vector
             long posX = car(position).asNumber().value;
             long posY = cdr(position).asNumber().value;
+            System.out.println("posX: " + posX + "posY: " + posY);
             long velX = car(velocity).asNumber().value;
             long velY = cdr(velocity).asNumber().value;
-            if (turn < 4) {
+            if (turn < 6) {
               if (Math.abs(posX) > Math.abs(posY)) {
                 dirX = -sign(posX);
                 dirY = -sign(posX);
               } else {
                 dirX = -sign(posY);
                 dirY = -sign(posY);
+              }
+            }
+            else if (turn < 8) {
+              if (Math.abs(posX) > Math.abs(posY)) {
+                dirX = -sign(posX)*2;
+                dirY = -sign(posX)*2;
+              } else {
+                dirX = -sign(posY)*2;
+                dirY = -sign(posY)*2;
               }
             } else {
               dirX = 0;
