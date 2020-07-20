@@ -38,9 +38,9 @@ def main(argv):
                     player_key)
 
     client.send(_JOIN, [])
-    client.send(_START, [442, 1, 0, 1])
+    client.send(_START, [200, 1, 0, 100])
     while True:
-        client.send(_COMMANDS, [])
+        client.send(_COMMANDS, [[3,[0,0,0,1]]])
 
 
 if __name__ == '__main__':
