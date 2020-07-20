@@ -1,4 +1,4 @@
-from game_items import *
+from .game_items import *
 
 
 def parse(raw_data):
