@@ -48,13 +48,16 @@ def visualizer_web():
 @app.route('/replayer', methods=["GET", "POST"])
 def replayer_web():
     raw_data = request.form.get("raw_data")
-    game_state = None
+    states = []
     if raw_data:
-        game_state = response_parser.parse(raw_data)
+        for line in raw_data.split('\n'):
+            if line:
+                state = response_parser.parse(line)
+                states.append(state)
 
     return render_template("replayer.html",
                            raw_data=raw_data,
-                           game_state=game_state)
+                           game_state=states)
 
 # api
 @app.route('/demodulate')

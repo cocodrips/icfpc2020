@@ -3,6 +3,7 @@
 
 
 {% block body %}
+
     <form action="/replayer" method="post">
         <div class="uk-flex-center" uk-grid>
             <div>
@@ -20,55 +21,82 @@
     </form>
 
     <div class="uk-grid uk-margin uk-flex-center">
-        {% if game_state %}
-{#            <div>#}
-            {#                <span>command: </span>#}
-            {#            </div>#}
-            <div>
-                <canvas id="canvas"
-                        width="{{ game_state.size }}"
-                        height="{{ game_state.size }}"></canvas>
-                <script>
-                    var colors = ["#8eeee3", "#ff67a7"];
-                    var canvas = document.getElementById("canvas");
-                    var context = canvas.getContext("2d");
-                    context.fillStyle = "black";
-                    context.fillRect(0, 0, canvas.width, canvas.height);
+        <input class="uk-input uk-form-width-small" type="text" placeholder="0"
+               id="turn-text" disabled>
+        <input type="range" class="uk-range  uk-form-width-large" min="0"
+               max="{{ game_state|length - 1 }}" value=0 id="turn-slider">
+    </div>
+    <div class="uk-grid uk-margin uk-flex-center">
+        <canvas id="canvas" width="500" height="500"></canvas>
+        <script>
+            let power = 3;
+            let scale = 500 / power;
+            let star_scale = 16;
+            let data = {{ game_state|tojson }};
 
-                    {% for x in game_state.ship_and_commands %}
-                        var color = colors[{{ x.ship.role }}];
-                        context.fillStyle = color;
-                        context.fillRect(
-                            {{ x.ship.position[0] + game_state.size/2 }} -1,
-                            {{ x.ship.position[1] + game_state.size/2 }} -1, 3, 3);
+            var slider = document.getElementById("turn-slider");
+            var turnText = document.getElementById("turn-text");
 
-                    {% endfor %}
-                    {##}
-                    {#                        context.fillStyle = "red";#}
-                    {##}
-                    {##}
-                    {#                        context.fillRect({{ -pictures.xmin }}, {{ -pictures.ymin }}, 3, 3);#}
-                    {##}
-                    {#                        context.fillStyle = "#20cfcd";#}
-                    {#                        context.globalAlpha = 0.5;#}
-                    {#                        var i = 0;#}
-                    {##}
-                    {#                        {% for picture in pictures.pictures %}#}
-                    {#                            {% if picture.image_id == image_id %}#}
-                    {#                                context.fillStyle = colors[i % 10];#}
-                    {#                                console.log(i, colors[i % colors.length]);#}
-                    {#                                {% for point in picture.points %}#}
-                    {#                                    context.fillRect({{ point[0] - pictures.xmin }}, {{ point[1] - pictures.ymin }}, 1, 1);#}
-                    {#                                {% endfor %}#}
-                    {#                                i++;#}
-                    {##}
-                    {#                            {% endif %}#}
-                    {#                        {% endfor %}#}
-                </script>
-                <input type="range" class="uk-range">
-            </div>
-        {% endif %}
+            function draw(state) {
+                var canvas = document.getElementById("canvas");
+                var context = canvas.getContext("2d");
+                context.resetTransform();
+                context.scale(power, power);
+                context.fillStyle = "black";
+                context.fillRect(0, 0, canvas.width, canvas.height);
 
+
+                context.fillStyle = "white";
+                context.fillRect(
+                    scale / 2 - star_scale / 2, scale / 2 - star_scale / 2, star_scale, star_scale);
+
+
+                var colors = ["#8eeee3", "#ff67a7"];
+
+                var shootColors = ["rgba(142,238,227,0.4)", "rgba(255,103,167,0.38)"];
+
+                for (const target of state.ship_and_commands) {
+                    context.fillStyle = colors[target.ship.role];
+
+                    let ship = target.ship;
+                    let x = ship.position[0] + scale / 2;
+                    let y = ship.position[1] + scale / 2;
+                    context.fillRect(x - 1, y - 1, 3, 3);
+
+
+                    for (const command of target.command.commands) {
+                        // アクセル
+                        if (command[0] == 0) {
+                            for (let i = 1; i < 4; i++) {
+                                context.fillStyle = colors[target.ship.role];
+                                context.fillRect(x + command[1][0] * i, y + command[1][1] * i, 1, 1);
+                            }
+                        }
+
+                        // shoot
+                        if (command[0] == 2) {
+                            context.strokeStyle = shootColors[target.ship.role];
+                            context.beginPath () ;
+                            context.moveTo(x, y);
+                            let _x = command[1][0] + scale / 2;
+                            let _y = command[1][1] + scale / 2;
+                            context.lineTo(_x, _y);
+                            context.lineWidth = 1;
+                            context.stroke() ;
+                        }
+                    }
+                }
+            }
+
+            function changedTurn() {
+                turnText.value = document.getElementById("turn-slider").value;
+                draw(data[turnText.value])
+            }
+
+            slider.addEventListener("input", changedTurn, false);
+            draw(data[0]);
+
+        </script>
     </div>
 {% endblock %}
 
