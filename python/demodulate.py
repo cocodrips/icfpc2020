@@ -1,30 +1,30 @@
 import io
 
 
-def _demod_expr(r):
+def _demod_expr(src):
     result = []
 
     while True:
-        kind = r.read(2)
+        kind = src.read(2)
         if   kind == '00':
             return result
         elif kind == '01':
-            return _with_cdr(result, +_demod_number(r))
+            return _with_cdr(result, +_demod_number(src))
         elif kind == '10':
-            return _with_cdr(result, -_demod_number(r))
+            return _with_cdr(result, -_demod_number(src))
         elif kind == '11':
-            result.append(_demod_expr(r))
+            result.append(_demod_expr(src))
         else:
             raise ValueError()
 
 
-def _demod_number(r):
+def _demod_number(src):
     size = 0
-    while r.read(1) == '1':
+    while src.read(1) == '1':
         size += 4
     if size == 0:
         return 0
-    return int(r.read(size), 2)
+    return int(src.read(size), 2)
 
 
 def _with_cdr(result, cdr):
