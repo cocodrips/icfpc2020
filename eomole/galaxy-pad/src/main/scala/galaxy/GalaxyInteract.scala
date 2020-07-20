@@ -114,7 +114,7 @@ object GalaxyInteract {
   private lazy val sc = new Scanner(System.in)
 
   def click(verbose: Boolean): Expr = {
-    if(verbose) {
+    if (verbose) {
       println(s"input click pos:")
     }
     val x = sc.nextInt()
@@ -125,7 +125,7 @@ object GalaxyInteract {
   import dispatch._
 
   def sendAlienProxy(data: Expr, verbose: Boolean): Expr = {
-    if(verbose) {
+    if (verbose) {
       println(s"send to alien proxy (https://icfpc2020-api.testkontur.ru/swagger/index.html)")
     }
     val response =
@@ -140,11 +140,20 @@ object GalaxyInteract {
       .POST
       .setContentType("text/plain", StandardCharsets.UTF_8)
 
+  private[this] def tutorialState(s: Long): String =
+    s"ap ap cons 6 ap ap cons ap ap cons $s ap ap cons 5 ap ap cons 0 ap ap cons 1 ap ap cons 1 ap ap cons 0 ap ap cons nil ap ap cons nil ap ap cons 4 ap ap cons nil ap ap cons nil ap ap cons nil ap ap cons nil nil ap ap cons 8 ap ap cons nil nil"
+
   def main(args: Array[String]): Unit =
     if (args.size >= 1 && args(0) == "-s") {
       val initState = if (args.size >= 2) Demodulator.dem(args(1)) else Nil
       val initEvent = if (args.size >= 3) Demodulator.dem(args(2)) else click(false)
       new GalaxyInteract(new GalaxyEval(Parser.parse(Source.fromURL(getClass.getResource("/galaxy.txt")).mkString)))
+        .start(initState, initEvent)
+    } else if (args.size >= 1 && args(0) == "-t") {
+      val stage = if (args.size >= 2) args(1).toLong else 1
+      val initState = Parser.parse(tutorialState(stage)).head
+      val initEvent = sendAlienProxy(Apply(Apply(Cons, Number(1)), Apply(Apply(Cons, Number(stage)), Nil)), verbose = true)
+      new GalaxyInteract(new GalaxyEval(Parser.parse(Source.fromURL(getClass.getResource("/galaxy.txt")).mkString)), verbose = true)
         .start(initState, initEvent)
     } else {
       println("usege:")
@@ -154,6 +163,7 @@ object GalaxyInteract {
       println("\tfrom select (a): `java -Xss1g -jar galaxy.jar 110110010111110110000111010110011001100110011001101111100110010011011001001101101000110000 1101100001110111110011001001101100100`")
       println("\tmulti player: `java -Xss1g -jar galaxy.jar 1101100101111101100010110110000011001100110011001100110111110011001010111100000110111000001001110000 110110000001100000`")
       println("\tsilent mode: `java -Xss1g -jar galaxy.jar -s [modulated state str] [modulated event str]`")
+      println("\ttutorial mode: `java -Xss1g -jar galaxy.jar -t [stage number]`")
       println()
 
       val initState = if (args.size >= 1) Demodulator.dem(args(0)) else Nil
