@@ -127,12 +127,15 @@ class Main {
             long velY = cdr(velocity).asNumber().value;
             if (turn < 2) {
               if (Math.abs(posX) > Math.abs(posY)) {
-                dirX = -sign(posX);
-                dirY = -sign(posX);
+                dirX = -sign(posX) *2;
+                dirY = -sign(posX) *2;
               } else {
-                dirX = -sign(posY);
-                dirY = -sign(posY);
+                dirX = -sign(posY) *2;
+                dirY = -sign(posY) *2;
               }
+            } else {
+              dirX = 0;
+              dirY = 0;
             }
             Expr acc = cons(dirX, dirY);
             Expr command = cons(0, cons(shipId, cons(acc, NIL)));
