@@ -214,13 +214,28 @@ class Main {
 
         // Shoot.
         if (role == 0 && !otherShips.isEmpty() && random.nextFloat() < 0.3) {
-            Expr otherShip = otherShips.get(random.nextInt(otherShips.size()));
-            Vector otherPos = Vector.fromExpr(idx(otherShip, 2));
-            Vector otherVel = Vector.fromExpr(idx(otherShip, 3));
-            Expr target = cons(otherPos.x + otherVel.x, otherPos.y + otherVel.y);
-            Expr shootCommand = cons(2, cons(shipId, cons(target, cons(64, NIL))));
-            commands = cons(shootCommand, commands);
-            System.out.println("shoot: " + PrettyPrinter.toPrettyString(shootCommand));
+            for (Expr otherShip : otherShips) {
+                Vector otherPos = Vector.fromExpr(idx(otherShip, 2));
+                Vector otherVel = Vector.fromExpr(idx(otherShip, 3));
+                long ox = otherPos.x + otherVel.x;
+                long oy = otherPos.y + otherVel.y;
+                long mx = pos.x + vel.x;
+                long my = pos.y + vel.y;
+                if (Math.abs(ox - mx) <= 5 && Math.abs(oy - mx) <= 5
+                    && myShips.size() >= otherShips.size()) {
+                    Expr shootCommand = cons(1, cons(shipId, NIL));
+                    commands = cons(shootCommand, commands);
+                    System.out.println("bang!: " + PrettyPrinter.toPrettyString(shootCommand));
+                    otherShips.remove(otherShip);
+                    break;
+                } else if (Math.abs(ox - mx) <= 20 && Math.abs(oy - mx) <= 20) {
+                    Expr shootCommand = cons(2, cons(shipId, cons(cons(ox, oy), cons(64, NIL))));
+                    commands = cons(shootCommand, commands);
+                    System.out.println("shoot: " + PrettyPrinter.toPrettyString(shootCommand));
+                    otherShips.remove(otherShip);
+                    break;
+                }
+            }
         }
 
         // Instantiate.
