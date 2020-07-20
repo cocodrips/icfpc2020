@@ -68,20 +68,19 @@ class Main {
             this.x = x;
             this.y = y;
         }
-        public static Vector of(long x, long y) {
-            return new Vector(x, y);
+        public static Vector of(long x, long y) { return new Vector(x, y); }
+        public static Vector fromExpr(Expr expr) {
+            return Vector.of(car(expr).asNumber().value, cdr(expr).asNumber().value);
         }
-        public Vector orthogonal() {
-            return Vector.of(y, -x);
-        }
-        public Expr toExpr() {
-            return cons(x, y);
-        }
-        public boolean isZero() {
-            return x == 0 && y == 0;
-        }
-        public long x;
-        public long y;
+        public Vector orthogonal() { return Vector.of(y, -x); }
+        public Expr toExpr() { return cons(x, y); }
+        public boolean isZero() { return x == 0 && y == 0; }
+        public long l1Norm() { return Math.abs(x) + Math.abs(y); }
+        public double l2Norm() { return Math.sqrt(x * x + y * y); }
+        public long lInfNorm() { return Math.max(Math.abs(x), Math.abs(y)); }
+        @Override public String toString() { return "(" + x + "," + y + ")"; };
+        public final long x;
+        public final long y;
     }
 
     public static void main(String[] args) throws Exception {
@@ -140,22 +139,16 @@ class Main {
 
             // Rotate.
             long shipId = idx(myShip, 1).asNumber().value;
-            Expr pos = idx(myShip, 2); // vector
-            System.out.println("pos: " + PrettyPrinter.toPrettyString(pos));
-            long posX = car(pos).asNumber().value;
-            long posY = cdr(pos).asNumber().value;
-            long posNorm = (long) Math.sqrt(posX * posX + posY * posY);
-            Expr vel = idx(myShip, 3); // vector
-            System.out.println("vel: " + PrettyPrinter.toPrettyString(vel));
-            long velX = car(vel).asNumber().value;
-            long velY = cdr(vel).asNumber().value;
-            long velNorm = (long) Math.sqrt(velX * velX + velY * velY);
-            long gravityX = Math.abs(posX) >= Math.abs(posY) ? sign(posX) : 0;
-            long gravityY = Math.abs(posY) >= Math.abs(posX) ? sign(posY) : 0;
+            Vector pos = Vector.fromExpr(idx(myShip, 2));
+            System.out.println("pos: " + pos);
+            Vector vel = Vector.fromExpr(idx(myShip, 3));
+            System.out.println("vel: " + vel);
+            long gravityX = Math.abs(pos.x) >= Math.abs(pos.y) ? sign(pos.x) : 0;
+            long gravityY = Math.abs(pos.y) >= Math.abs(pos.x) ? sign(pos.y) : 0;
             Vector acc = Vector.of(0, 0);
             if (gravityX != 0 && gravityY !=0) {
                 acc = Vector.of(-gravityX, -gravityY);
-            } else if ((velNorm < 8 && posNorm <= 80) || posNorm <= 35) {
+            } else if ((vel.l2Norm() < 8 && pos.l2Norm() <= 80) || pos.l2Norm() <= 35) {
                 // Initial state or emergency.
                 if (gravityX != 0) {
                     acc = Vector.of(-gravityX, -gravityX);
@@ -164,13 +157,13 @@ class Main {
                 }
             } else {
                 if (gravityX > 0) {
-                    acc = findAcc(posX, posY, velX, velY, +1);
+                    acc = findAcc(pos.x, pos.y, vel.x, vel.y, +1);
                 } else if (gravityX < 0) {
-                    acc = findAcc(posX, posY, velX, velY, -1);
+                    acc = findAcc(pos.x, pos.y, vel.x, vel.y, -1);
                 } else if (gravityY > 0) {
-                    acc = findAcc(posY, posX, velY, velX, +1).orthogonal();
+                    acc = findAcc(pos.y, pos.x, vel.y, vel.x, +1).orthogonal();
                 } else if (gravityY < 0) {
-                    acc = findAcc(posY, posX, velY, velX, -1).orthogonal();
+                    acc = findAcc(pos.y, pos.x, vel.y, vel.x, -1).orthogonal();
                 }
             }
             if (!acc.isZero()) {
@@ -181,13 +174,9 @@ class Main {
 
             // Shoot.
             if (role == 0 && otherShip != null && random.nextFloat() < 0.3) {
-                Expr otherPos = idx(otherShip, 2); // vector
-                Expr otherVel = idx(otherShip, 3); // vector
-                long otherPosX = car(otherPos).asNumber().value;
-                long otherPosY = cdr(otherPos).asNumber().value;
-                long otherVelX = car(otherVel).asNumber().value;
-                long otherVelY = cdr(otherVel).asNumber().value;
-                Expr target = cons(otherPosX + otherVelX, otherPosY + otherVelY);
+                Vector otherPos = Vector.fromExpr(idx(otherShip, 2));
+                Vector otherVel = Vector.fromExpr(idx(otherShip, 3));
+                Expr target = cons(otherPos.x + otherVel.x, otherPos.y + otherVel.y);
                 Expr shootCommand = cons(2, cons(shipId, cons(target, cons(64, NIL))));
                 commands = cons(shootCommand, commands);
                 System.out.println("shoot: " + PrettyPrinter.toPrettyString(shootCommand));
