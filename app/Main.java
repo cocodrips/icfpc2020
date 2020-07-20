@@ -133,7 +133,7 @@ class Main {
             if (turn == 0) {
               origPosX = posX;
               origPosY = posY;
-              origDim = Math.abs(posX) > Math.abs(posY);
+              firstDim = Math.abs(posX) > Math.abs(posY);
             }
             if (turn == 0) {
               if (Math.abs(posX) > Math.abs(posY)) {
