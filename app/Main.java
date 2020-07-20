@@ -104,7 +104,7 @@ class Main {
 
         System.out.println(PrettyPrinter.toPrettyString(res2));
 
-        Expr data = cons(200, cons(30, cons(30, cons(1, NIL))));
+        Expr data = cons(200, cons(30, cons(10, cons(1, NIL))));
         Expr req3 = cons(3, cons(playerKey, cons(data, NIL)));
         Expr gameRes = send(URI.create(apiUrl), req3);
         System.out.println(PrettyPrinter.toPrettyString(gameRes));
@@ -155,7 +155,8 @@ class Main {
             Vector acc = Vector.of(0, 0);
             if (gravityX != 0 && gravityY !=0) {
                 acc = Vector.of(-gravityX, -gravityY);
-            } else if (velNorm < 8 && posNorm <= 80) {
+            } else if ((velNorm < 8 && posNorm <= 80) || posNorm <= 35) {
+                // Initial state or emergency.
                 if (gravityX != 0) {
                     acc = Vector.of(-gravityX, -gravityX);
                 } else {
