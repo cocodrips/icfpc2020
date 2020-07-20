@@ -146,18 +146,22 @@ class Main {
             long accY = 0;
             if (turn < 8) {
               if (Math.abs(posX) > Math.abs(posY)) {
-                accY = dirY;
+                accY = dirY + velX * 2;
               } else {
                 accX = dirX;
               }
             }
             if (firstDim &&  (origDim == (Math.abs(posX) > Math.abs(posY)))) {
-              if (turn >= 2) {
-                if (Math.abs(posX) > Math.abs(posY)) {
-                  accX = dirX;
-                } else {
-                  accY = dirY;
-                }
+              long newPosX = posX + velX * 3;
+              long newPosY = posY + velY * 3;
+              long newDir = 1;
+              if ((Math.abs(posX) > Math.abs(posY)) != (Math.abs(newPosX) > Math.abs(newPosY))) {
+                newDir = -1;
+              }
+              if (Math.abs(posX) > Math.abs(posY)) {
+                accX = dirX * newDir;
+              } else {
+                accY = dirY * newDir;
               }
             }
             if (firstDim && (origDim != (Math.abs(posX) > Math.abs(posY)))) {
