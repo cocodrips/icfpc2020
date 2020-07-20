@@ -142,8 +142,8 @@ class Main {
                 dirY = -sign(origPosY);
               }
             }
-            long accX = 0;
-            long accY = 0;
+            long accX = dirX;
+            long accY = dirY;
             if (turn < 8) {
               if (Math.abs(posX) > Math.abs(posY)) {
                 accY = dirY;
@@ -159,9 +159,9 @@ class Main {
                 newDir = -1;
               }
               if (Math.abs(posX) > Math.abs(posY)) {
-                accX = dirX * newDir;
+                dirX *= newDir;
               } else {
-                accY = dirY * newDir;
+                dirY *= newDir;
               }
             }
             if (firstDim && (origDim != (Math.abs(posX) > Math.abs(posY)))) {
