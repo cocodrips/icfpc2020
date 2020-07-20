@@ -180,7 +180,7 @@ class Main {
             }
 
             // Shoot.
-            if (role == 0 && otherShip != null && random.nextFloat() < 0.1) {
+            if (role == 0 && otherShip != null && random.nextFloat() < 0.3) {
                 Expr otherPos = idx(otherShip, 2); // vector
                 Expr otherVel = idx(otherShip, 3); // vector
                 long otherPosX = car(otherPos).asNumber().value;
@@ -204,6 +204,16 @@ class Main {
 
     private static Vector findAcc(long posX, long posY, long velX, long velY, long dX) {
         Vector best = Vector.of(0, 0);
+        // Fix shape
+        if (Math.abs(Math.abs(posX) - Math.abs(posY)) < 10) {
+            if (Math.abs(velX) > Math.abs(velY) + 2) {
+                System.out.println("too horizontal shape.");
+                return Vector.of(sign(velX), -sign(velY));
+            } else if (Math.abs(velY) > Math.abs(velX) + 2) {
+                System.out.println("too vertical shape.");
+                return Vector.of(-sign(velX), sign(velY));
+            }
+        }
         long bestCond = dX * velX * velY - (posY + velY);
         System.out.println("default cond: " + bestCond);
         // Save energy!
