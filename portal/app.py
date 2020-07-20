@@ -54,14 +54,20 @@ def game_web():
     attacker = request.form.get("attacker", "").strip()[:7]
     defender = request.form.get("defender", "").strip()[:7]
     message = ""
+    log_id = ""
     if attacker and defender:
         res = requests.get("http://104.197.240.151:28910/run", params={"attacker": attacker,
                                                                      "defender": defender})
-        message = json.loads(res.text)
+
+        # message = json.loads(json.loads(res.text))
+        # log_id = message["attack_id"]
+
     return render_template("game.html",
                            attacker=attacker,
                            defender=attacker,
-                           message=message)
+                           message=message,
+                           # log_id=log_id
+                           )
 
 
 @app.route('/replayer', methods=["GET", "POST"])
@@ -88,16 +94,21 @@ def replayer_web():
                 state = response_parser.parse(line)
                 states.append(state)
 
-    print(states)
-
     return render_template("replayer.html",
                            log_id=log_id,
                            raw_data=raw_data,
                            game_state=states)
 
-@app.route('/hello')
-def hello():
-    return 'hello'
+@app.route('/run_status')
+def run_status():
+    log_id = request.args.get('log-id')
+    res = requests.get("http://104.197.240.151:28910/status")
+    if res.status_code == 200:
+        for d in json.loads(json.loads(res.text)):
+            if d['attaker_key'] == log_id:
+                return d['status']
+
+    return 'not found status'
 
 # api
 @app.route('/demodulate')
