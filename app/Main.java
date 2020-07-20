@@ -112,7 +112,7 @@ class Main {
         long role = idx(staticGameInfo, 1).asNumber().value;
 
         Random random = new Random();
-        int motionState = -1;
+        int motionState = 0;
         int mode = 0;
         while (true) {
             long stage = idx(gameRes, 1).asNumber().value;
@@ -162,11 +162,10 @@ class Main {
                     if (++motionState <= 8) acc = Vector.of(0, sign(pos.y));
                 } else if (Math.abs(pos.y) == 14) {
                     acc = Vector.of(-gravityX, vel.y);
-                } else if (motionState == 0) {
+                } else if (vel.y != 0) {
                     acc = Vector.of(-gravityX, 0);
                 } else {
                     acc = Vector.of(-gravityX, sign(pos.y - sign(pos.y) * 14));
-                    ++motionState;
                 }
             } else if (mode == 2) {
                 System.out.println("mode = 2");
@@ -175,11 +174,10 @@ class Main {
                     if (++motionState <= 8) acc = Vector.of(sign(pos.x), 0);
                 } else if (Math.abs(pos.x) == 14) {
                     acc = Vector.of(vel.x, -gravityY);
-                } else if (motionState == 0) {
+                } else if (vel.y != 0) {
                     acc = Vector.of(0, -gravityY);
                 } else {
                     acc = Vector.of(sign(pos.x - sign(pos.x) * 14), -gravityY);
-                    ++motionState;
                 }
             } else if (gravityX != 0 && gravityY != 0) {
                 acc = Vector.of(gravityY, -gravityX);
