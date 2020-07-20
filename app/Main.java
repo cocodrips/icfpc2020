@@ -114,6 +114,8 @@ class Main {
         Random random = new Random();
         int motionState = 0;
         int mode = 0;
+        long motionVelX = 0;
+        long motionVelY = 0;
         while (true) {
             long stage = idx(gameRes, 1).asNumber().value;
             if (stage == 2) { break; }
@@ -159,7 +161,8 @@ class Main {
                 System.out.println("mode = 1");
                 System.out.println("motionState = " + motionState);
                 if (motionState > 0 || (Math.abs(pos.y) == 14 && vel.y == 0)) {
-                    if (++motionState <= 8) acc = Vector.of(0, sign(pos.y));
+                    if (motionVelY == 0) motionVelY = sign(pos.y);
+                    if (++motionState <= 8) acc = Vector.of(0, motionVelY);
                 } else if (Math.abs(pos.y) == 14) {
                     acc = Vector.of(-gravityX, vel.y);
                 } else if (vel.y != 0) {
@@ -171,10 +174,11 @@ class Main {
                 System.out.println("mode = 2");
                 System.out.println("motionState = " + motionState);
                 if (motionState > 0 || (Math.abs(pos.x) == 14 && vel.x == 0)) {
-                    if (++motionState <= 8) acc = Vector.of(sign(pos.x), 0);
+                    if (motionVelX == 0) motionVelX = sign(pos.x);
+                    if (++motionState <= 8) acc = Vector.of(motionVelX, 0);
                 } else if (Math.abs(pos.x) == 14) {
                     acc = Vector.of(vel.x, -gravityY);
-                } else if (vel.y != 0) {
+                } else if (vel.x != 0) {
                     acc = Vector.of(0, -gravityY);
                 } else {
                     acc = Vector.of(sign(pos.x - sign(pos.x) * 14), -gravityY);
