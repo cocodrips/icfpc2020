@@ -96,6 +96,7 @@ class Main {
         Random random = new Random();
         boolean movestarted = false;
         boolean moveend = false;
+        boolean moveend2 = false;
         boolean booststarted = false;
         long boost = 8;
         long target14 = 14;
@@ -195,10 +196,14 @@ class Main {
               accY = moveY;
               movestarted = true;
             } else if (movestarted && !moveend && !booststarted) {
-              if (Math.abs(posX) > Math.abs(posY)) {
-                accX = moveX;
+              if (moveend2 == false) {
+                moveend2 = true;
               } else {
-                accY = moveY;
+                if (Math.abs(posX) > Math.abs(posY)) {
+                  accX = moveX;
+                } else {
+                  accY = moveY;
+                }
               }
             } else if (movestarted && moveend && !booststarted) {
               if (Math.abs(posX) > Math.abs(posY)) {
