@@ -94,12 +94,11 @@ class Main {
 
         System.out.println(PrettyPrinter.toPrettyString(gameRes));
         Random random = new Random();
-        long dirX = 0;
-        long dirY = 0;
-        long origPosX = 0;
-        long origPosY = 0;
-        boolean origDim = true;
-        boolean firstDim = true;
+        boolean movestarted = false;
+        boolean moveend = false;
+        boolean booststarted = false;
+        long boost = 8;
+        long target14 = 14;
         while (true) {
             long stage = idx(gameRes, 1).asNumber().value;
             if (stage == 2) { break; }
@@ -130,42 +129,72 @@ class Main {
             System.out.println("posX: " + posX + "posY: " + posY);
             long velX = car(velocity).asNumber().value;
             long velY = cdr(velocity).asNumber().value;
-            if (turn == 0) {
-              origPosX = posX;
-              origPosY = posY;
-              firstDim = Math.abs(posX) > Math.abs(posY);
-              if (Math.abs(posX) > Math.abs(posY)) {
-                dirX = -sign(origPosX);
-                dirY = sign(origPosY);
-              } else {
-                dirX = sign(origPosX);
-                dirY = -sign(origPosY);
-              }
-            }
             long accX = 0;
             long accY = 0;
-            if (turn < 8) {
+            
+            long moveX = 0;
+            long moveY = 0;
+            long boostX = 0;
+            long boostY = 0;
+
+            { // dir move to 14, 48
               if (Math.abs(posX) > Math.abs(posY)) {
-                accY = dirY;
+                moveX = -sign(posX);
+                boostX = sign(posX);
+                if (posY < -14) {
+                  moveY = -1;
+                  target14 = -14;
+                } else if (posY > 14) {
+                  moveY = 1;
+                } else if (posY > 0) {
+                  moveY = -1;
+                } else {
+                  moveY = 1;
+                  target14 = -14;
+                }
               } else {
-                accX = dirX;
+                moveY = -sign(posY);
+                boostY = sign(posY);
+                if (posX > 14) {
+                  moveX = 1;
+                } else if (posX < -14) {
+                  moveX = -1;
+                  target14 = -14;
+                } else if (posX > 0) {
+                  moveX = -1;
+                } else {
+                  moveX = 1;
+                  target14 = -14;
+                }
               }
             }
-            if (firstDim &&  (origDim == (Math.abs(posX) > Math.abs(posY)))) {
-              long newPosX = posX + velX * 4;
-              long newPosY = posY + velY * 4;
-              long newDir = 1;
-              if ((Math.abs(posX) > Math.abs(posY)) != (Math.abs(newPosX) > Math.abs(newPosY))) {
-                newDir = -1;
+            if (posX == 48) {
+              if(Math.abs(posX - target14) == 0) {
+                moveend = true;
               }
-              if (Math.abs(posX) > Math.abs(posY)) {
-                dirX *= newDir;
-              } else {
-                dirY *= newDir;
+            } else {
+              if(Math.abs(posY - target14) == 0) {
+                moveend = true;
               }
             }
-            if (firstDim && (origDim != (Math.abs(posX) > Math.abs(posY)))) {
-              firstDim = false;
+
+            if(!movestarted && !moveend && !booststarted) {
+              accX = moveX;
+              accY = moveY;
+              movestarted = true;
+            } else if (movestarted && moveend && !booststarted) {
+              if (Math.abs(posX) > Math.abs(posY)) {
+                accY = moveY;
+              } else {
+                accX = moveX;
+              }
+              booststarted = true;
+            } else if(movestarted && moveend && booststarted) {
+              if (boost != 0) {
+                accX = boostX;
+                accY = boostY;
+                boost--;
+              }
             }
 
             Expr acc = cons(accX, accY);
