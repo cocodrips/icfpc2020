@@ -131,7 +131,7 @@ class Main {
                 dirX = -sign(posX);
                 dirY = -sign(posX);
               } else {
-                dirX = -sign(posY);
+                dirX = sign(posY);
                 dirY = -sign(posY);
               }
             } else {
