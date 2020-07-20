@@ -129,8 +129,15 @@ class Main {
               grabX = velX;
               grabY = velY;
             }
-            long accX = turn == 0 ? 0 : -grabX;
-            long accY = turn == 0 ? 0 : -grabY;;
+            long accX = 0;
+            long accY = 0;
+            if (turn == 1) {
+              accX = 2*grabX;
+              accY = 2*grabY;
+            } else if (turn > 1) {
+              accX = grabX;
+              accY = grabY;
+            }
             Expr acc = cons(accX, accY);
             Expr command = cons(0, cons(shipId, cons(acc, NIL)));
 
