@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}
+    demodulator
+{% endblock %}
+
+
+{% block body %}
+
+    <form class="uk-form-stacked" action="/game" method="post">
+
+        <legend class="uk-legend">Game</legend>
+
+        <div class="uk-margin">
+            <label class="uk-form-label" for="form-stacked-text">Attacker</label>
+            <div class="uk-form-controls">
+                <input class="uk-input" id="form-stacked-text" type="text" placeholder="commit hash" name="attacker">
+            </div>
+        </div>
+
+        <div class="uk-margin">
+            <label class="uk-form-label" for="form-stacked-text">Defender</label>
+            <div class="uk-form-controls">
+                <input class="uk-input" id="form-stacked-text" type="text" placeholder="commit hash" name="defender">
+            </div>
+        </div>
+
+        <div class="uk-margin">
+            <button type="submit"
+                    class="uk-button uk-button-default">
+                submit
+            </button>
+        </div>
+
+        <div class="uk-margin">
+            {{ message }}
+        </div>
+
+
+    </form>
+
+{% endblock %}
+
+
+
