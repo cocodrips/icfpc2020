@@ -113,6 +113,7 @@ class Main {
 
         Random random = new Random();
         int motionState = -1;
+        int mode = 0;
         while (true) {
             long stage = idx(gameRes, 1).asNumber().value;
             if (stage == 2) { break; }
@@ -148,7 +149,14 @@ class Main {
             long gravityX = Math.abs(pos.x) >= Math.abs(pos.y) ? sign(pos.x) : 0;
             long gravityY = Math.abs(pos.y) >= Math.abs(pos.x) ? sign(pos.y) : 0;
             Vector acc = Vector.of(0, 0);
-            if (role == 0 && Math.abs(pos.x) == 48 && gravityY == 0) {
+            if (role == 0 && Math.abs(pos.x) == 48 && gravityY == 0 && mode == 0) {
+                mode = 1;
+            }
+            if (role == 0 && Math.abs(pos.y) == 48 && gravityX == 0 && mode == 0) {
+                mode = 2;
+            }
+            if (mode == 1) {
+                System.out.println("mode = 1");
                 if (motionState > 0 || Math.abs(pos.y) == 14) {
                     if (++motionState <= 8) acc = Vector.of(0, sign(pos.y));
                 } else if (motionState == 0) {
@@ -157,7 +165,8 @@ class Main {
                     acc = Vector.of(-gravityX, sign(pos.y - sign(pos.y) * 14));
                     ++motionState;
                 }
-            } else if (role == 0 && Math.abs(pos.y) == 48 && gravityX == 0) {
+            } else if (mode == 2) {
+                System.out.println("mode = 2");
                 if (motionState > 0 || Math.abs(pos.x) == 14) {
                     if (++motionState <= 8) acc = Vector.of(0, sign(pos.x));
                 } else if (motionState == 0) {
@@ -166,8 +175,6 @@ class Main {
                     acc = Vector.of(sign(pos.x - sign(pos.x) * 14), -gravityY);
                     ++motionState;
                 }
-            } else if (motionState >= 0) {
-                // do nothing
             } else if (gravityX != 0 && gravityY != 0) {
                 acc = Vector.of(gravityY, -gravityX);
             } else if ((vel.l2Norm() < 8 && pos.l2Norm() <= 80) || pos.l2Norm() <= 35) {
@@ -188,7 +195,7 @@ class Main {
                     acc = findAcc(pos.y, pos.x, vel.y, vel.x, gravityY, gravityX, -1).swapped();
                 }
             }
-            if (motionState == -1) {
+            if (mode == 0) {
                 boolean xRisk =
                     sign(pos.x) == sign(vel.x) && (Math.abs(pos.x) > 90 || Math.abs(vel.x) >= 10);
                 if (xRisk) {
