@@ -5,24 +5,26 @@ import demodulate
 import modulate
 
 
-class Error(Exception):
-    pass
+_API_KEY = '95052afa4bf54914a26622eea251b536'
+_JOIN = 2
+_START = 3
+_COMMANDS = 4
 
 
 class Client(object):
 
-    def __init__(self, url):
+    def __init__(self, url, key):
         self.url = url
+        self.key = key
 
-    def send(self, req):
-        raw_req = modulate.modulate(req)
-        print(f'--> {req!r}; {raw_req}')
-        http_res = requests.post(self.url, data=raw_req)
-        http_res.raise_for_status()
-        raw_res = http_res.text.strip()
-        res = demodulate.demodulate(raw_res)
-        print(f'<-- {res!r}; {raw_res}')
-        if res == [0]: raise Error('request error')
+    def send(self, cmd, arg):
+        req = [cmd, self.key, arg]
+        print(f'--> {req!r}')
+        res = requests.post(self.url, data=modulate.modulate(req))
+        res.raise_for_status()
+        res = demodulate.demodulate(res.text.strip())
+        print(f'<-- {res!r}')
+        if res == [0]: sys.exit('request error')
         return res
 
 
@@ -32,11 +34,13 @@ def main(argv):
 
     print((server_url, player_key))
 
-    client = Client(f'{server_url}/aliens/send')
+    client = Client(f'{server_url}/aliens/send?apiKey={_API_KEY}',
+                    player_key)
 
-    client.send([2, player_key, []])
-    client.send([3, player_key, [442, 1, 0, 1]])
-    while True: client.send([4, player_key, []])
+    client.send(_JOIN, [])
+    client.send(_START, [442, 1, 0, 1])
+    while True:
+        client.send(_COMMANDS, [])
 
 
 if __name__ == '__main__':
