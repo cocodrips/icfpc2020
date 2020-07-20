@@ -1,39 +1,23 @@
-import sys
+def modulate(expr):
+    if isinstance(expr, int):
+        n = (abs(expr).bit_length() + 3) // 4
+        return '{sign}{ones}0{body}'.format(
+            sign=('10' if (expr < 0) else '01'),
+            ones=('1' * n),
+            body=(f'{abs(expr):064b}'[64-4*n:]),
+        )
 
+    if isinstance(expr, tuple):
+        if len(expr) == 2:
+            return f'11{modulate(expr[0])}{modulate(expr[1])}'
+        else:
+            raise ValueError(f'invalid expression: {expr!r}')
 
-def modulate(e):
-  ty = type(e)
-  if ty == tuple:
-    if len(e) != 2:
-      raise ValueError('innput contais tuple of size not 2')
-    return '11{}{}'.format(modulate(e[0]), modulate(e[1]))
-  elif ty == list:
-    if len(e) == 0:
-      return '00'
-    return modulate((e[0], e[1:]))
-  elif ty == int:
-    if e == 0:
-      return '010'
+    if isinstance(expr, list):
+        return ''.join(f'11{modulate(x)}' for x in expr) + '00'
 
-    header = '01' if e > 0 else '10'
-    e = abs(e)
+    raise ValueError(f'invalid expression: {expr!r}')
 
-    n_bits = e.bit_length()
-    n_4bits = (n_bits + 3) // 4
-    bits = '{:064b}'.format(e)
-
-    return '{}{}0{}'.format(header, '1' * n_4bits, bits[64 - 4 * n_4bits:])
-  else:
-    raise ValueError('input contains unknown expression')
-
-
-def modulate_from_string(string):
-  parsed = eval(string.replace('nil', '[]'))
-  return modulate(parsed)
-
-def main():
-  line = sys.stdin.readline()
-  print(modulate_from_string(line))
 
 if __name__ == '__main__':
-  main()
+    print(modulate(eval(input().replace('nil', '[]'))))
