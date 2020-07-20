@@ -123,11 +123,11 @@ class Main {
             long posY = cdr(position).asNumber().value;
             long velX = car(velocity).asNumber().value;
             long velY = cdr(velocity).asNumber().value;
-            long accX = -sign(posX);
-            long accY = -sign(posY);
+            long accX = -sign(posX) * 2;
+            long accY = -sign(posY) * 2;
             Expr acc = cons(accX, accY);
             Expr command;
-            if (turn > 3 && (turn % 2 == 0)) {
+            if (turn > 3 || (turn % 2 == 0)) {
               Expr param = cons(0, cons(0, cons(0, cons(1, NIL))));
               command = cons(3, cons(shipId, cons(param, NIL)));
             } else {
