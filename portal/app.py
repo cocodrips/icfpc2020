@@ -1,3 +1,4 @@
+import os
 import json
 import requests
 
@@ -57,14 +58,14 @@ def game_web():
     log_id = ""
     if attacker and defender:
         res = requests.get("http://104.197.240.151:28910/run", params={"attacker": attacker,
-                                                                     "defender": defender})
+                                                                       "defender": defender})
 
-        # message = json.loads(json.loads(res.text))
+        message = json.loads(res.text)
         # log_id = message["attack_id"]
 
     return render_template("game.html",
                            attacker=attacker,
-                           defender=attacker,
+                           defender=defender,
                            message=message,
                            # log_id=log_id
                            )
@@ -75,7 +76,6 @@ def replayer_web():
     raw_data = ''
     log_id = request.form.get("log-id")
     states = []
-
 
     if log_id:
         log_url = f"https://storage.googleapis.com/ai-test-logs/{log_id.strip()}.txt"
@@ -99,6 +99,7 @@ def replayer_web():
                            raw_data=raw_data,
                            game_state=states)
 
+
 @app.route('/run_status')
 def run_status():
     log_id = request.args.get('log-id')
@@ -109,6 +110,7 @@ def run_status():
                 return d['status']
 
     return 'not found status'
+
 
 # api
 @app.route('/demodulate')
