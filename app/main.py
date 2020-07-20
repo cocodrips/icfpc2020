@@ -46,7 +46,7 @@ class GameState:
     size: int = 500
 
 
-def parse(data):
+def parse(data) -> GameState:
     res, stage, static_game_info, game_state = data
     x0, role, x2, x3, x4 = static_game_info
     ship_and_command_obj: [ShipAndCommand] = []
@@ -89,8 +89,10 @@ def main(argv):
     res = client.send(_START, [200, 1, 0, 100])
 
     while True:
-        print(parse(res))
-        client.send(_COMMANDS, [])
+        state = parse(res)
+        # for ships in state.ship_and_commands:
+        client.send(_COMMANDS, [[3,[0,0,0,1]]])
+            # break
 
 
 if __name__ == '__main__':
