@@ -151,16 +151,12 @@ class Main {
             if (role == 0 && Math.abs(pos.x) == 48 && gravityY == 0) {
                 if (motionState > 0 || Math.abs(pos.y) == 14) {
                     if (++motionState <= 8) acc = Vector.of(-sign(pos.x), 0);
-                } else if (vel.y == 0) {
-                    acc = Vector.of(gravityX, sign(pos.y - sign(pos.y) * 14));
                 } else {
                     acc = Vector.of(gravityX, 0);
                 }
             } else if (role == 0 && Math.abs(pos.y) == 48 && gravityX == 0) {
                 if (motionState > 0 || Math.abs(pos.x) == 14) {
                     if (++motionState <= 8) acc = Vector.of(0, -sign(pos.y));
-                } else if (vel.x == 0) {
-                    acc = Vector.of(sign(pos.x - sign(pos.x) * 14), gravityY);
                 } else {
                     acc = Vector.of(0, gravityY);
                 }
