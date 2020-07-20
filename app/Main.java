@@ -157,8 +157,11 @@ class Main {
             }
             if (mode == 1) {
                 System.out.println("mode = 1");
-                if (motionState > 0 || Math.abs(pos.y) == 14) {
+                System.out.println("motionState = " + motionState);
+                if (motionState > 0 || (Math.abs(pos.y) == 14 && vel.y == 0)) {
                     if (++motionState <= 8) acc = Vector.of(0, sign(pos.y));
+                } else if (Math.abs(pos.y) == 14) {
+                    acc = Vector.of(-gravityX, vel.y);
                 } else if (motionState == 0) {
                     acc = Vector.of(-gravityX, 0);
                 } else {
@@ -167,8 +170,11 @@ class Main {
                 }
             } else if (mode == 2) {
                 System.out.println("mode = 2");
-                if (motionState > 0 || Math.abs(pos.x) == 14) {
+                System.out.println("motionState = " + motionState);
+                if (motionState > 0 || (Math.abs(pos.x) == 14 && vel.x == 0)) {
                     if (++motionState <= 8) acc = Vector.of(0, sign(pos.x));
+                } else if (Math.abs(pos.x) == 14) {
+                    acc = Vector.of(vel.x, -gravityY);
                 } else if (motionState == 0) {
                     acc = Vector.of(0, -gravityY);
                 } else {
