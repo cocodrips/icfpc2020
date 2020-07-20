@@ -106,7 +106,10 @@ class Main {
 
         System.out.println(PrettyPrinter.toPrettyString(res2));
 
-        Expr data = cons(200, cons(30, cons(0, cons(15, NIL))));
+        // Change here to stop children!
+        long shipCount = 15;
+        Expr data = cons(
+            200, cons(30, cons(shipCount == 1 ? 10 : 0, cons(shipCount, NIL))));
         Expr req3 = cons(3, cons(playerKey, cons(data, NIL)));
         Expr gameRes = send(URI.create(apiUrl), req3);
         System.out.println(PrettyPrinter.toPrettyString(gameRes));
@@ -145,7 +148,8 @@ class Main {
             for (Expr ship : myShips) {
                 long shipId = idx(ship, 1).asNumber().value;
                 commands = createCommands(
-                    commands, ship, role, shipId == mainShipId, myShips, otherShips, random);
+                    commands, ship, role, shipId == mainShipId, shipCount,
+                    myShips, otherShips, random);
             }
             System.out.println("commands: " + PrettyPrinter.toPrettyString(commands));
             Expr gameReq = cons(4, cons(playerKey, cons(commands, NIL)));
@@ -156,7 +160,7 @@ class Main {
     }
 
     private static Expr createCommands(
-        Expr commands, Expr ship, long role, boolean isMain,
+        Expr commands, Expr ship, long role, boolean isMain, long shipCount,
         List<Expr> myShips, List<Expr> otherShips, Random random) {
         long shipId = idx(ship, 1).asNumber().value;
         // Rotate.
@@ -220,7 +224,7 @@ class Main {
         }
 
         // Instantiate.
-        if (isMain && random.nextFloat() < 0.1) {
+        if (isMain && shipCount > 1 && random.nextFloat() < 0.1 && acc.isZero()) {
             Expr params = cons(0, cons(0, cons(0, cons(1, NIL))));
             Expr newCommand = cons(3, cons(shipId, cons(params, NIL)));
             commands = cons(newCommand, commands);
