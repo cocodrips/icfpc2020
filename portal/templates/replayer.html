@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}replayer{% endblock %}
+
+
+{% block body %}
+    <form action="/replayer" method="post">
+        <div class="uk-flex-center" uk-grid>
+            <div>
+            <textarea name="raw_data" placeholder="[flag, state, data]..."
+                      class="uk-textarea" cols="140" rows="3"
+                      style="width: 700px">{% if raw_data %}{{ raw_data }}{% endif %}</textarea>
+            </div>
+            <div>
+                <button class="uk-button uk-button-default" type="submit">
+                    replay
+                </button>
+            </div>
+
+        </div>
+    </form>
+
+    <div class="uk-grid uk-margin uk-flex-center">
+        {% if game_state %}
+{#            <div>#}
+            {#                <span>command: </span>#}
+            {#            </div>#}
+            <div>
+                <canvas id="canvas"
+                        width="{{ game_state.size }}"
+                        height="{{ game_state.size }}"></canvas>
+                <script>
+                    var colors = ["#8eeee3", "#ff67a7"];
+                    var canvas = document.getElementById("canvas");
+                    var context = canvas.getContext("2d");
+                    context.fillStyle = "black";
+                    context.fillRect(0, 0, canvas.width, canvas.height);
+
+                    {% for x in game_state.ship_and_commands %}
+                        var color = colors[{{ x.ship.role }}];
+                        context.fillStyle = color;
+                        context.fillRect(
+                            {{ x.ship.position[0] + game_state.size/2 }} -1,
+                            {{ x.ship.position[1] + game_state.size/2 }} -1, 3, 3);
+
+                    {% endfor %}
+                    {##}
+                    {#                        context.fillStyle = "red";#}
+                    {##}
+                    {##}
+                    {#                        context.fillRect({{ -pictures.xmin }}, {{ -pictures.ymin }}, 3, 3);#}
+                    {##}
+                    {#                        context.fillStyle = "#20cfcd";#}
+                    {#                        context.globalAlpha = 0.5;#}
+                    {#                        var i = 0;#}
+                    {##}
+                    {#                        {% for picture in pictures.pictures %}#}
+                    {#                            {% if picture.image_id == image_id %}#}
+                    {#                                context.fillStyle = colors[i % 10];#}
+                    {#                                console.log(i, colors[i % colors.length]);#}
+                    {#                                {% for point in picture.points %}#}
+                    {#                                    context.fillRect({{ point[0] - pictures.xmin }}, {{ point[1] - pictures.ymin }}, 1, 1);#}
+                    {#                                {% endfor %}#}
+                    {#                                i++;#}
+                    {##}
+                    {#                            {% endif %}#}
+                    {#                        {% endfor %}#}
+                </script>
+                <input type="range" class="uk-range">
+            </div>
+        {% endif %}
+
+    </div>
+{% endblock %}
+
+
+

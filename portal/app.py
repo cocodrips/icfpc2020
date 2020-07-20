@@ -2,6 +2,7 @@ import json
 
 from flask import Flask, request, render_template, Response
 from api import modem, visualizer, interactor
+from api.replayer import response_parser
 from api.protocol import galaxy
 from jinja2 import Template, Environment, FileSystemLoader
 
@@ -43,6 +44,17 @@ def visualizer_web():
     return render_template("visualizer.html",
                            raw_data=raw_data,
                            pictures=pictures)
+
+@app.route('/replayer', methods=["GET", "POST"])
+def replayer_web():
+    raw_data = request.form.get("raw_data")
+    game_state = None
+    if raw_data:
+        game_state = response_parser.parse(raw_data)
+
+    return render_template("replayer.html",
+                           raw_data=raw_data,
+                           game_state=game_state)
 
 # api
 @app.route('/demodulate')
