@@ -187,9 +187,7 @@ class Main {
                 long otherPosY = cdr(otherPos).asNumber().value;
                 long otherVelX = car(otherVel).asNumber().value;
                 long otherVelY = cdr(otherVel).asNumber().value;
-                Expr target = cons(
-                    otherPosX + otherVelX + random.nextInt(2) - 1,
-                    otherPosY + otherVelY + random.nextInt(2) - 1);
+                Expr target = cons(otherPosX + otherVelX, otherPosY + otherVelY);
                 Expr shootCommand = cons(2, cons(shipId, cons(target, cons(64, NIL))));
                 commands = cons(shootCommand, commands);
                 System.out.println("shoot: " + PrettyPrinter.toPrettyString(shootCommand));
@@ -214,7 +212,7 @@ class Main {
                 return Vector.of(-sign(velX), sign(velY));
             }
         }
-        long bestCond = dX * velX * velY - (posY + velY);
+        long bestCond = dX * velX * velY + (posY + velY);
         System.out.println("default cond: " + bestCond);
         // Save energy!
         long potentialChangePerTurn = Math.max(Math.abs(velX), Math.abs(velY));
@@ -227,7 +225,7 @@ class Main {
                 if (Math.abs(accX) + Math.abs(accY) > 2) {
                     continue;
                 }
-                long cond = dX * (velX + accX) * (velY + accY) - (posY + velY);
+                long cond = dX * (velX - accX) * (velY - accY) + (posY + velY);
                 if (Math.abs(cond) < Math.abs(bestCond)) {
                     bestCond = cond;
                     best = Vector.of(accX, accY);
