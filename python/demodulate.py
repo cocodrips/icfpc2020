@@ -62,7 +62,6 @@ def demodulate(src):
 
 def main():
   line = sys.stdin.readline().strip()
-
   parsed = demodulate(line)
   print(parsed)
 
