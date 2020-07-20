@@ -123,16 +123,10 @@ class Main {
             long posY = cdr(position).asNumber().value;
             long velX = car(velocity).asNumber().value;
             long velY = cdr(velocity).asNumber().value;
-            long accX = -sign(posX) * 2;
-            long accY = -sign(posY) * 2;
+            long accX = 0;
+            long accY = -sign(posY);
             Expr acc = cons(accX, accY);
-            Expr command;
-            if (turn > 3 || (turn % 2 == 0)) {
-              Expr param = cons(0, cons(0, cons(0, cons(1, NIL))));
-              command = cons(3, cons(shipId, cons(param, NIL)));
-            } else {
-              command = cons(0, cons(shipId, cons(acc, NIL)));
-            }
+            Expr command = cons(0, cons(shipId, cons(acc, NIL)));
 
             System.out.println("command: " + PrettyPrinter.toPrettyString(command));
             Expr commands = cons(command, NIL);
