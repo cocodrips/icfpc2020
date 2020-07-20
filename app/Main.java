@@ -152,8 +152,8 @@ class Main {
               }
             }
             if (firstDim &&  (origDim == (Math.abs(posX) > Math.abs(posY)))) {
-              long newPosX = posX + velX * 3;
-              long newPosY = posY + velY * 3;
+              long newPosX = posX + velX * 4;
+              long newPosY = posY + velY * 4;
               long newDir = 1;
               if ((Math.abs(posX) > Math.abs(posY)) != (Math.abs(newPosX) > Math.abs(newPosY))) {
                 newDir = -1;
