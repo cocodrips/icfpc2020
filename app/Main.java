@@ -94,8 +94,8 @@ class Main {
 
         System.out.println(PrettyPrinter.toPrettyString(gameRes));
         Random random = new Random();
-        long grabX = 0;
-        long grabY = 0;
+        long dirX = 0;
+        long dirY = 0;
         while (true) {
             long stage = idx(gameRes, 1).asNumber().value;
             if (stage == 2) { break; }
@@ -126,12 +126,13 @@ class Main {
             long velX = car(velocity).asNumber().value;
             long velY = cdr(velocity).asNumber().value;
             if (turn == 0) {
-              grabX = velX;
-              grabY = velY;
+              if (Math.abs(posX) > Math.abs(posY)) {
+                dirX = -sign(posX);
+              } else {
+                dirY = -sign(posY);
+              }
             }
-            long accX = grabX;
-            long accY = grabY;
-            Expr acc = cons(accX, accY);
+            Expr acc = cons(dirX, dirY);
             Expr command = cons(0, cons(shipId, cons(acc, NIL)));
 
             System.out.println("command: " + PrettyPrinter.toPrettyString(command));
