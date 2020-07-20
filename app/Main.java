@@ -142,8 +142,8 @@ class Main {
                 dirY = -sign(origPosY);
               }
             }
-            long accX = dirX;
-            long accY = dirY;
+            long accX = 0;
+            long accY = 0;
             if (turn < 8) {
               if (Math.abs(posX) > Math.abs(posY)) {
                 accY = dirY;
