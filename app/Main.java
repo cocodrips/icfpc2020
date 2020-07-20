@@ -86,7 +86,7 @@ class Main {
 
         System.out.println(PrettyPrinter.toPrettyString(res2));
 
-        Expr data = cons(256, cons(64, cons(10, cons(256, NIL))));
+        Expr data = cons(152, cons(0, cons(8, cons(100, NIL))));
         Expr req3 = cons(3, cons(playerKey, cons(data, NIL)));
         Expr gameRes = send(URI.create(apiUrl), req3);
         Expr staticGameInfo = idx(gameRes, 2);
@@ -123,18 +123,16 @@ class Main {
             long posY = cdr(position).asNumber().value;
             long velX = car(velocity).asNumber().value;
             long velY = cdr(velocity).asNumber().value;
-            long accX = Math.abs(posX) > 70
-                ? sign(posX)
-                : (Math.abs(posX) > 50
-                    ? 0
-                    : (Math.abs(velX) < 8 ? sign(posY) : 0));
-            long accY = Math.abs(posX) > 70
-                ? sign(posY)
-                : (Math.abs(posY) > 50
-                    ? 0
-                    : (Math.abs(velY) < 8 ? -sign(posX) : 0));
+            long accX = sign(posX);
+            long accY = sign(posY);
             Expr acc = cons(accX, accY);
-            Expr command = cons(3, cons( cons(0, cons(0, cons(0, cons(1, NIL)))) , NIL));
+            Expr command;
+            if (turn > 3 && (turn % 2 == 0)) {
+              Expr param = cons(0, cons(0, cons(0, cons(1, NIL))));
+              command = cons(3, cons(shipId, cons(param, NIL)));
+            } else {
+              command = cons(0, cons(shipId, cons(acc, NIL)));
+            }
 
             System.out.println("command: " + PrettyPrinter.toPrettyString(command));
             Expr commands = cons(command, NIL);
