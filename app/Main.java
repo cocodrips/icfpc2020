@@ -106,7 +106,7 @@ class Main {
 
         System.out.println(PrettyPrinter.toPrettyString(res2));
 
-        Expr data = cons(200, cons(30, cons(10, cons(1, NIL))));
+        Expr data = cons(200, cons(30, cons(0, cons(15, NIL))));
         Expr req3 = cons(3, cons(playerKey, cons(data, NIL)));
         Expr gameRes = send(URI.create(apiUrl), req3);
         System.out.println(PrettyPrinter.toPrettyString(gameRes));
@@ -150,6 +150,7 @@ class Main {
             System.out.println("commands: " + PrettyPrinter.toPrettyString(commands));
             Expr gameReq = cons(4, cons(playerKey, cons(commands, NIL)));
             gameRes = send(URI.create(apiUrl), gameReq);
+            System.out.println();
             System.out.println(PrettyPrinter.toPrettyString(gameRes));
         }
     }
@@ -176,7 +177,10 @@ class Main {
                 acc = Vector.of(gravityY, -gravityY);
             }
         } else if (pos.l2Norm() < 90) {
-            if (gravityX > 0) {
+            if (!isMain && random.nextFloat() < 0.05) {
+                // Randomize non-main ships.
+                acc = Vector.of(random.nextInt(2) - 1, random.nextInt(2) - 1);
+            } else if (gravityX > 0) {
                 acc = findAcc(pos.x, pos.y, vel.x, vel.y, gravityX, gravityY, +1);
             } else if (gravityX < 0) {
                 acc = findAcc(pos.x, pos.y, vel.x, vel.y, gravityX, gravityY, -1);
@@ -213,6 +217,14 @@ class Main {
             Expr shootCommand = cons(2, cons(shipId, cons(target, cons(64, NIL))));
             commands = cons(shootCommand, commands);
             System.out.println("shoot: " + PrettyPrinter.toPrettyString(shootCommand));
+        }
+
+        // Instantiate.
+        if (isMain && random.nextFloat() < 0.1) {
+            Expr params = cons(0, cons(0, cons(0, cons(1, NIL))));
+            Expr newCommand = cons(3, cons(shipId, cons(params, NIL)));
+            commands = cons(newCommand, commands);
+            System.out.println("new: " + PrettyPrinter.toPrettyString(newCommand));
         }
         return commands;
     }
