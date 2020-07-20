@@ -95,6 +95,9 @@ def replayer_web():
                            raw_data=raw_data,
                            game_state=states)
 
+@app.route('/hello')
+def hello():
+    return 'hello'
 
 # api
 @app.route('/demodulate')
