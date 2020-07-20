@@ -150,7 +150,7 @@ class Main {
             Vector acc = Vector.of(0, 0);
             if (role == 0 && Math.abs(pos.x) == 48 && gravityY == 0) {
                 if (motionState > 0 || Math.abs(pos.y) == 14) {
-                    if (++motionState <= 8) acc = Vector.of(-sign(pos.x), 0);
+                    if (++motionState <= 8) acc = Vector.of(0, sign(pos.y));
                 } else if (motionState == 0) {
                     acc = Vector.of(-gravityX, 0);
                 } else {
@@ -159,7 +159,7 @@ class Main {
                 }
             } else if (role == 0 && Math.abs(pos.y) == 48 && gravityX == 0) {
                 if (motionState > 0 || Math.abs(pos.x) == 14) {
-                    if (++motionState <= 8) acc = Vector.of(0, -sign(pos.y));
+                    if (++motionState <= 8) acc = Vector.of(0, sign(pos.x));
                 } else if (motionState == 0) {
                     acc = Vector.of(0, -gravityY);
                 } else {
@@ -188,17 +188,19 @@ class Main {
                     acc = findAcc(pos.y, pos.x, vel.y, vel.x, gravityY, gravityX, -1).swapped();
                 }
             }
-            boolean xRisk =
-                sign(pos.x) == sign(vel.x) && (Math.abs(pos.x) > 90 || Math.abs(vel.x) >= 10);
-            if (xRisk) {
-                System.out.println("risky x.");
-                acc = Vector.of(sign(pos.x), acc.y);
-            }
-            boolean yRisk =
-                sign(pos.y) == sign(vel.y) && (Math.abs(pos.y) > 90 || Math.abs(vel.y) >= 10);
-            if (yRisk) {
-                System.out.println("risky y.");
-                acc = Vector.of(acc.x, sign(pos.y));
+            if (motionState == -1) {
+                boolean xRisk =
+                    sign(pos.x) == sign(vel.x) && (Math.abs(pos.x) > 90 || Math.abs(vel.x) >= 10);
+                if (xRisk) {
+                    System.out.println("risky x.");
+                    acc = Vector.of(sign(pos.x), acc.y);
+                }
+                boolean yRisk =
+                    sign(pos.y) == sign(vel.y) && (Math.abs(pos.y) > 90 || Math.abs(vel.y) >= 10);
+                if (yRisk) {
+                    System.out.println("risky y.");
+                    acc = Vector.of(acc.x, sign(pos.y));
+                }
             }
             if (!acc.isZero()) {
                 Expr accCommand = cons(0, cons(shipId, cons(acc.toExpr(), NIL)));
