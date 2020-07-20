@@ -125,13 +125,13 @@ class Main {
             long posY = cdr(position).asNumber().value;
             long velX = car(velocity).asNumber().value;
             long velY = cdr(velocity).asNumber().value;
-            if (turn < 2) {
+            if (turn < 4) {
               if (Math.abs(posX) > Math.abs(posY)) {
-                dirX = -sign(posX) *2;
-                dirY = -sign(posX) *2;
+                dirX = -sign(posX);
+                dirY = -sign(posX);
               } else {
-                dirX = -sign(posY) *2;
-                dirY = -sign(posY) *2;
+                dirX = -sign(posY);
+                dirY = -sign(posY);
               }
             } else {
               dirX = 0;
