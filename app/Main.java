@@ -184,9 +184,9 @@ class Main {
               movestarted = true;
             } else if (movestarted && !moveend && !booststarted) {
               if (Math.abs(posX) > Math.abs(posY)) {
-                moveX = -sign(posX);
+                accX = moveX;
               } else {
-                moveY = -sign(posY);
+                accY = moveY;
               }
             } else if (movestarted && moveend && !booststarted) {
               if (Math.abs(posX) > Math.abs(posY)) {
