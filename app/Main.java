@@ -86,7 +86,7 @@ class Main {
 
         System.out.println(PrettyPrinter.toPrettyString(res2));
 
-        Expr data = cons(64, cons(64, cons(10, cons(1, NIL))));
+        Expr data = cons(256, cons(64, cons(10, cons(256, NIL))));
         Expr req3 = cons(3, cons(playerKey, cons(data, NIL)));
         Expr gameRes = send(URI.create(apiUrl), req3);
         Expr staticGameInfo = idx(gameRes, 2);
@@ -135,18 +135,8 @@ class Main {
             Expr acc = cons(accX, accY);
             Expr command = cons(0, cons(shipId, cons(acc, NIL)));
 
-            // Shoot if acc is zero.
-            if (role == 0 && accX == 0 && accY == 0 && otherShip != null) {
-                Expr otherPos = idx(otherShip, 2); // vector
-                Expr otherVel = idx(otherShip, 3); // vector
-                long otherPosX = car(otherPos).asNumber().value;
-                long otherPosY = cdr(otherPos).asNumber().value;
-                long otherVelX = car(otherVel).asNumber().value;
-                long otherVelY = cdr(otherVel).asNumber().value;
-                Expr target = cons(
-                    otherPosX + otherVelX + random.nextInt(2) - 1,
-                    otherPosY + otherVelY + random.nextInt(2) - 1);
-                command = cons(2, cons(shipId, cons(target, cons(10, NIL))));
+            if (role == 0 && accX == 0 && accY == 0) {
+                command = cons(3, cons(0, 0, 0, 0));
             }
             System.out.println("command: " + PrettyPrinter.toPrettyString(command));
             Expr commands = cons(command, NIL);
