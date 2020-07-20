@@ -3,5 +3,5 @@ steps:
   args: ['clone', 'https://github.com/icfpcontest2020/dockerfiles']
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-f', './dockerfiles/dockerfiles/python/Dockerfile', '-t', 'client:$SHORT_SHA', '.']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['run', "--network=cloudbuild",'--entrypoint=./strict_run.sh', '-t', 'client:$SHORT_SHA', 'https://dummy-server-prtffs3u5a-uc.a.run.app/', 'test_key']
+  #- name: 'gcr.io/cloud-builders/docker'
+  #  args: ['run', "--network=cloudbuild",'--entrypoint=./strict_run.sh', '-t', 'client:$SHORT_SHA', 'https://dummy-server-prtffs3u5a-uc.a.run.app/', 'test_key']
