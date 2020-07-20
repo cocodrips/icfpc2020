@@ -1,30 +1,22 @@
-import sys
+def apapnize(expr):
+  if isinstance(expr, int):
+    return str(expr)
+
+  if isinstance(expr, tuple):
+    if len(expr) == 2:
+      return f'ap ap cons {apapnize(expr[0])} {apapnize(expr[1])}'
+    else:
+      raise ValueError(f'invalid expression: {expr!r}')
+
+  if isinstance(expr, list):
+    return ''.join(f'ap ap cons {apapnize(x)} ' for x in expr) + 'nil'
+
+  raise ValueError(f'invalid expression: {expr!r}')
 
 
-def apapnize(e):
-  ty = type(e)
-  if ty == tuple:
-    if len(e) != 2:
-      raise ValueError('innput contais tuple of size not 2')
-    return 'ap ap cons {} {}'.format(apapnize(e[0]), apapnize(e[1]))
-  elif ty == list:
-    if len(e) == 0:
-      return 'nil'
-    return apapnize((e[0], e[1:]))
-  elif ty == int:
-    return e
-  else:
-    raise ValueError('input contains unknown expression')
-
-
-def main():
-  line = sys.stdin.readline()
-
-  nil = []
-  parsed = eval(line)
-
-  print(apapnize(parsed))
+def apapnize_from_string(s):
+  return apapnize(eval(s.replace('nil', '[]')))
 
 
 if __name__ == '__main__':
-  main()
+  print(apapnize_from_string(input()))
