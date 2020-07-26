@@ -1,8 +1,5 @@
 # boku_yaba
 
-Note to the team members: the original README (in Japanese) has been moved
-to [README.ja.md](./README.ja.md).
-
 ## Members
 
 See **Contributors**.
