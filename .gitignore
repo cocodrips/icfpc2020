@@ -4,4 +4,5 @@ Dockerfile
 !*/Dockerfile
 bin/
 _build/
+*.class
 thirdparty/
