@@ -5,7 +5,19 @@ to [README.ja.md](./README.ja.md).
 
 ## Members
 
-TODO
+See **Contributors**.
+
+## Directory
+
+### Galaxy Pad
+
+* `eomole/galaxy-pad` contains the final implementation of Galaxy Pad.
+* `yuizumi/galaxy.py` is our first Galaxy evaluator.
+* `yuizumi/` also contains a Java implementation.
+
+### AIs
+
+* See `submissions/*` branches; `app/` contains the logic.
 
 ## Screenshots
 
