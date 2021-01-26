@@ -44,7 +44,7 @@ public class Demodulator {
       }
       String repr = str.substring(pos, pos + 4 * size);
       pos += 4 * size;
-      long value = sign * Long.valueOf(repr);
+      long value = sign * Long.valueOf(repr, 2);
       return Number.of(value);
     }
 
